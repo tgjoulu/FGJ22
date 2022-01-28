@@ -2,8 +2,8 @@ import 'phaser';
 
 import MainScene from './scenes/main';
 
-const DEFAULT_WIDTH = 1024;
-const DEFAULT_HEIGHT = 576;
+const DEFAULT_WIDTH = 1280;
+const DEFAULT_HEIGHT = 720;
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -22,7 +22,8 @@ const config: Phaser.Types.Core.GameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false,
+            gravity: { y: 300 },
+            debug: true,
         },
     },
     title: 'Degen After',
