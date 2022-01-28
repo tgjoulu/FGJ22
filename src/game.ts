@@ -1,32 +1,34 @@
 import 'phaser';
 
 import MainScene from './scenes/main';
-
-const DEFAULT_WIDTH = 1280;
-const DEFAULT_HEIGHT = 720;
+import StageScene from './scenes/stage';
+import Constants from './constants';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     backgroundColor: '#ffffff',
+    pixelArt: true,
     render: {
         pixelArt: true,
     },
     scale: {
         parent: 'phaser-game',
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.NONE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: DEFAULT_WIDTH,
-        height: DEFAULT_HEIGHT,
+        width: Constants.DESIGN_WIDTH,
+        height: Constants.DESIGN_HEIGHT,
+        zoom: 2,
     },
-    scene: [MainScene],
+    scene: [StageScene],
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
             debug: true,
+            tileBias: 4,
+            gravity: { y: 300 },
         },
     },
-    title: 'Degen After',
+    title: 'TODO',
 };
 
 window.addEventListener('load', () => {
