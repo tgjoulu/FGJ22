@@ -106,3 +106,5 @@ dist
 # WSL2 + Windows stuff
 .gitattributes
 .vscode/settings.json
+
+*.DS_Store
