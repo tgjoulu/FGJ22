@@ -1,14 +1,8 @@
 import 'phaser';
 
 import MainScene from './scenes/main';
-<<<<<<< HEAD
 import StageScene from './scenes/stage';
 import Constants from './constants';
-=======
-
-const DEFAULT_WIDTH = 1280;
-const DEFAULT_HEIGHT = 720;
->>>>>>> 3d31819232b6d628ebdadac8aeb48fa25db19cf0
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
