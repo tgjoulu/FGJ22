@@ -3,6 +3,7 @@ import 'phaser';
 import MainScene from './scenes/main';
 import StageScene from './scenes/stage';
 import Constants from './constants';
+import UIScene from './scenes/uiscene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -19,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
         height: Constants.DESIGN_HEIGHT,
         zoom: 2,
     },
-    scene: [StageScene],
+    scene: [StageScene, UIScene],
     physics: {
         default: 'arcade',
         arcade: {
@@ -33,4 +34,11 @@ const config: Phaser.Types.Core.GameConfig = {
 
 window.addEventListener('load', () => {
     const game = new Phaser.Game(config);
+
+    if (!localStorage.getItem('highscores')) {
+        const highscores = localStorage.setItem(
+            'highscores',
+            JSON.stringify({ 1: [], 2: [], 3: [], 4: [] })
+        );
+    }
 });

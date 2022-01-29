@@ -32,6 +32,13 @@ export default class StageScene extends Phaser.Scene {
 
         this.belowDark.visible = false;
         this.aboveDark.visible = false;
+
+        this.scene.launch('UIScene');
+    }
+
+    onLevelCompleted() {
+        // Tell UIScene that level is completed
+        this.events.emit('onLevelCompleted');
     }
 
     update() {}
