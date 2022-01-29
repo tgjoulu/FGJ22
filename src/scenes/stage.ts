@@ -1,6 +1,7 @@
 import Constants from '../constants';
 import Player from '../player/player';
 import Wave from '../objects/wave';
+import Squirrel from '../objects/squirrel';
 
 enum WorldSide {
     Light,
@@ -42,6 +43,10 @@ export default class StageScene extends Phaser.Scene {
             frameWidth: 40,
             frameHeight: 40,
         });
+        this.load.spritesheet('wolf', 'assets/sprites/wolf.png', {
+            frameWidth: 40,
+            frameHeight: 40,
+        });
         this.load.audio('drums', 'assets/sound/drums.wav');
         this.load.audio('bass', 'assets/sound/bass.wav');
         this.load.image('waveSprite', 'assets/sprites/wave.png');
@@ -67,6 +72,12 @@ export default class StageScene extends Phaser.Scene {
         bgBass.play({ volume: 0.005 });
 
         this._createWave();
+
+        this.events.on('onWorldChange', (activeWorld: 0 | 1) => {
+            (this.squirrels.getChildren() as Squirrel[]).forEach((child) => {
+                child.onWorldChange(activeWorld);
+            });
+        });
     }
 
     _restartScene() {
@@ -106,9 +117,7 @@ export default class StageScene extends Phaser.Scene {
         });
 
         // Add vihulaiset
-        var squirrel = this.squirrels.create(200, 600, 'squirrel');
-        var squirrel2 = this.squirrels.create(400, 600, 'squirrel');
-        var squirrel3 = this.squirrels.create(600, 600, 'squirrel');
+        this.squirrels.add(new Squirrel(this, 200, 600));
 
         this.add.existing(this.squirrels);
     }
@@ -166,19 +175,19 @@ export default class StageScene extends Phaser.Scene {
         this.aboveLight.visible = lightSide;
     }
 
-    _enableDebugKeys() {
+    _enableDebugKeys = () => {
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
             const activeWorldSide =
                 this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light;
             this._enableWorld(activeWorldSide);
-            this.registry.set('activeWorldSide', activeWorldSide);
+            this.events.emit('onWorldChange', activeWorldSide);
         });
         this.restartKey.on('down', () => {
             this._restartScene();
         });
-    }
+    };
 
     _createWave() {
         const mapBounds = this.physics.world.bounds;
@@ -193,7 +202,6 @@ export default class StageScene extends Phaser.Scene {
     }
 
     _checkPlayerBounds() {
-        console.log(this.player.y + ' vs ' + this.physics.world.bounds.bottom);
         if (this.player.y > this.physics.world.bounds.bottom) {
             console.log('RESTART');
             this._restartScene();
@@ -201,10 +209,12 @@ export default class StageScene extends Phaser.Scene {
     }
 
     _onPlayerWaveCollide = () => {
-      if (this.activeWorldSide == WorldSide.Light) {
-        this._enableWorld(WorldSide.Dark);
-      } else {
-        this._enableWorld(WorldSide.Light);
-      }
-    }
+        if (this.activeWorldSide == WorldSide.Light) {
+            this._enableWorld(WorldSide.Dark);
+            this.registry.set('activeWorldSide', WorldSide.Dark);
+        } else {
+            this._enableWorld(WorldSide.Light);
+            this.events.emit('onWorldChange', WorldSide.Light);
+        }
+    };
 }

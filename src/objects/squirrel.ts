@@ -1,24 +1,18 @@
-import { PhysicGraphics } from './physicGraphics';
-
 export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     // Constants
     readonly bunnySpeed = 400;
     readonly wolfSpeed = 900;
 
+    squirrelType: 'dark' | 'light' = 'dark';
+
     targetGraphic: Phaser.GameObjects.Graphics;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
-        super(scene, 200, 200, 'squirrel');
+        super(scene, x, y, 'squirrel');
         scene.add.existing(this);
-
-        // Textures
-        this.setTexture('squirrelSprite');
-        this.setScale(4);
 
         // Physics
         scene.physics.add.existing(this);
-        this.body.setSize(15, 30);
-        this.body.setOffset(8, 30);
         this.setCollideWorldBounds(true);
         (this.body as Phaser.Physics.Arcade.Body).onWorldBounds = true;
 
@@ -27,9 +21,20 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
         );
 
         // Stop velocity when hitting world bounds
-        this.scene.physics.world.on('worldbounds', () => {
+        scene.physics.world.on('worldbounds', () => {
             this.setVelocity(0);
             this.stop();
         });
     }
+
+    onWorldChange = (activeWorld: 0 | 1) => {
+        switch (activeWorld) {
+            case 0:
+                this.setTexture('squirrel');
+                break;
+            case 1:
+                this.setTexture('wolf');
+                break;
+        }
+    };
 }
