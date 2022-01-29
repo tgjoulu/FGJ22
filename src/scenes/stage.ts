@@ -1,7 +1,10 @@
 import Constants from '../constants';
 import Player from '../player/player';
 import Wave from '../objects/wave';
+import Collectable from '../objects/collectable';
 import Squirrel from '../objects/squirrel';
+import { Constraint } from 'matter';
+import { Physics } from 'phaser';
 
 enum WorldSide {
     Light,
@@ -20,12 +23,14 @@ export default class StageScene extends Phaser.Scene {
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
     private enemiesCollider: Phaser.Physics.Arcade.Collider;
     private activeWorldSide: WorldSide;
+    private collectableCount: number;
     private squirrels: Phaser.Physics.Arcade.Group;
 
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
 
-    private wave: Wave;
+    waveGroup: Phaser.Physics.Arcade.Group;
+    private waveTimer: Phaser.Time.Clock;
 
     constructor() {
         super({ key: 'StageScene' });
@@ -38,6 +43,10 @@ export default class StageScene extends Phaser.Scene {
         this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,
+        });
+        this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
+            frameWidth: 32,
+            frameHeight: 32,
         });
         this.load.spritesheet('squirrel', 'assets/sprites/squirrel.png', {
             frameWidth: 40,
@@ -63,6 +72,8 @@ export default class StageScene extends Phaser.Scene {
         this._enableWorld(WorldSide.Light);
         this._enableDebugKeys();
         this._initCamera();
+        this._initWaves();
+        this._createCollectables(map);
 
         // DEBUG: may be used but renders weird stuff
         //this._debugRenderTileCollisions(map);
@@ -70,8 +81,6 @@ export default class StageScene extends Phaser.Scene {
         const bgBass = this.sound.add('bass', { loop: true });
         bgDrums.play({ volume: 0.02 });
         bgBass.play({ volume: 0.005 });
-
-        this._createWave();
 
         this.events.on('onWorldChange', (activeWorld: 0 | 1) => {
             (this.squirrels.getChildren() as Squirrel[]).forEach((child) => {
@@ -161,6 +170,19 @@ export default class StageScene extends Phaser.Scene {
         this.enemiesCollider.active = false;
     }
 
+    _initWaves() {
+      this.waveGroup = this.physics.add.group({
+        runChildUpdate: true,
+        allowGravity: false,
+      });
+      this._createWave();
+      this.time.addEvent({
+          delay: 5000, //ms
+          callback: () => this._createWave(),
+          loop: true,
+      });
+    }
+
     _enableWorld(worldSide: WorldSide) {
         this.activeWorldSide = worldSide;
         const darkSide = worldSide == WorldSide.Dark;
@@ -189,10 +211,26 @@ export default class StageScene extends Phaser.Scene {
         });
     };
 
-    _createWave() {
+    _createWave = () => {
         const mapBounds = this.physics.world.bounds;
-        var wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
-        wave.createPlayerCollider(this.player, this._onPlayerWaveCollide);
+        new Wave(
+            this,
+            mapBounds.right,
+            mapBounds.top,
+            mapBounds.height,
+            this.player,
+            this._onPlayerWaveCollide
+        );
+    }
+
+    _createCollectables(tileMap: Phaser.Tilemaps.Tilemap) {
+        this.collectableCount = 0;
+        const collectables = tileMap.getObjectLayer('collectables');
+        collectables.objects.forEach((obj) => {
+            this.collectableCount++;
+            var collectable = new Collectable(this, obj.x!, obj.y!);
+            collectable.createPlayerCollider(this.player, this._onCollectableCollide);
+        });
     }
 
     update(time: number, dt: number) {
@@ -201,6 +239,10 @@ export default class StageScene extends Phaser.Scene {
             squirrel.update(time, dt);
         });
         this._checkPlayerBounds();
+        this.waveGroup.preUpdate(time, dt);
+        if (this.collectableCount == 0) {
+            console.log('VICTORY! TODO next level');
+        }
     }
 
     _checkPlayerBounds() {
@@ -218,5 +260,10 @@ export default class StageScene extends Phaser.Scene {
             this._enableWorld(WorldSide.Light);
             this.events.emit('onWorldChange', WorldSide.Light);
         }
+    };
+
+    _onCollectableCollide = () => {
+        this.collectableCount--;
+        console.log(this.collectableCount);
     };
 }
