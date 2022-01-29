@@ -6,8 +6,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private jumpKey: Phaser.Input.Keyboard.Key;
     private runSpeed: number = 240;
     private jumpForce: number = 200;
-    private acceleration: number = 150;
-    private airAcceleration: number = 80;
+    private acceleration: number = 180;
+    private airAcceleration: number = 100;
     private turnSpeed: number = 100;
     private airTurnSpeed: number = 80;
     private turnDelayMS: number = 300;
