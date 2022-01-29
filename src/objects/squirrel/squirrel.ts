@@ -5,15 +5,15 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     readonly bunnySpeed = 0.2;
     readonly wolfSpeed = 0.5;
     readonly walkingDistance = 30;
+    readonly waitingTimeBetweenMove = 100;
 
     private originalX: number;
-    private walking = true;
-    private detectingPlayer = false;
+    private waiting = true;
+    private isDetectingPlayer = false;
     private direction: 'left' | 'right';
+    private waitingDelta = 0;
 
-    enemyType: 'dark' | 'light' = 'dark';
-
-    lookupZone: Phaser.GameObjects.Graphics;
+    enemyType: 'dark' | 'light' = 'light';
 
     constructor(scene: Phaser.Scene, x: number, y: number, direction: 'left' | 'right') {
         super(scene, x, y, 'squirrel');
@@ -39,18 +39,6 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
         });
 
         this._initAnims();
-
-        // Add lookup zone
-        this.lookupZone = scene.add.graphics({ fillStyle: { color: 0xff0000 } });
-        this.lookupZone.displayOriginX = 80;
-        this.lookupZone.displayOriginY = 80;
-        var circle = new Phaser.Geom.Circle(this.x, this.y, 80);
-        this.lookupZone.fillCircleShape(circle);
-        scene.physics.add.existing(this.lookupZone);
-        (this.lookupZone.body as ArcadePhysicsCallback.Physics.Arcade.Body)
-            .setAllowGravity(false)
-            .setCircle(80);
-        this.lookupZone.on('onCollide', () => console.log('lol'));
     }
 
     _initAnims() {
@@ -65,25 +53,39 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(time: number, dt: number) {
-        if (this.walking) {
+        if (!this.waiting) {
             switch (this.direction) {
                 case 'left':
                     this.x = this.x - this.bunnySpeed;
                     if (this.x < this.originalX - this.walkingDistance) {
                         this.direction = 'right';
+                        this.waiting = true;
                     }
                     break;
                 case 'right':
                     this.x = this.x + this.bunnySpeed;
                     if (this.x > this.originalX + this.walkingDistance) {
                         this.direction = 'left';
+                        this.waiting = true;
                     }
                     break;
             }
+        } else {
+            if (this.waitingDelta > this.waitingTimeBetweenMove) {
+                this.waiting = false;
+                this.waitingDelta = 0;
+            }
+            this.waitingDelta = this.waitingDelta + 1;
         }
-
-        this.lookupZone.setPosition(this.x, this.y);
     }
+
+    onPlayerDetected = () => {
+        this.isDetectingPlayer = true;
+    };
+
+    onLostPlayer = () => {
+        this.isDetectingPlayer = false;
+    };
 
     onWorldChange = (activeWorld: 0 | 1) => {
         switch (activeWorld) {
