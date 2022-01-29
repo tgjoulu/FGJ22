@@ -13,11 +13,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private turnDelayMS: number = 300;
     private curTurnDelayMS: number = 0;
     private drag: number = 600;
-    private airDrag: number = 1000;
+    private airDrag: number = 1500;
     private wallJumpForceY: number = 150;
     private wallJumpForceX: number = 180;
-    private wallJumpTriggerEaseMS = 50;
+    private wallJumpTriggerEaseMS = 150; // Should be less than turnDelayMS
+    private groundTouchTriggerEaseMS = 100;
     private lastWallTouch: number = 0;
+    private lastGroundTouch: number = 0;
     private curTime: number = 0;
 
     body: Phaser.Physics.Arcade.Body;
@@ -37,7 +39,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     _bindKeys() {
         this.jumpKey.on('down', () => {
-            if (this._isGrounded()) {
+            if (this._canJump()) {
                 this.setVelocityY(-this.jumpForce);
             } else if (this._canWallJump()) {
                 this.setVelocityY(-this.wallJumpForceY);
@@ -54,8 +56,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.curTurnDelayMS -= dt;
             return;
         }
+        this._updateGroundTouch(time);
         this._updateWallTouch(time);
-        const grounded = this._isGrounded();
+        const grounded = this.body.blocked.down;
         this.setDragX(grounded ? this.drag : this.airDrag);
         if (this.moveRightKey.isDown) {
             this.setAccelerationX(grounded ? this.acceleration : this.airAcceleration);
@@ -72,8 +75,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    _isGrounded(): boolean {
-        return this.body.blocked.down;
+    _canJump(): boolean {
+        return this.curTime - this.lastGroundTouch < this.groundTouchTriggerEaseMS;
+    }
+
+    _updateGroundTouch(time: number) {
+        if (this.body.blocked.down) {
+            this.lastGroundTouch = time;
+        }
     }
 
     _updateWallTouch(time: number) {
@@ -83,6 +92,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     _canWallJump(): boolean {
-        return this.curTime - this.lastWallTouch < this.wallJumpTriggerEaseMS;
+        return (
+            this.curTurnDelayMS <= 0 &&
+            this.curTime - this.lastWallTouch < this.wallJumpTriggerEaseMS
+        );
     }
 }
