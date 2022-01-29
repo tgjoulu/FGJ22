@@ -65,6 +65,12 @@ export default class StageSceneBase extends Phaser.Scene {
         const map = this.make.tilemap({ key: `${this.stageName}_map` });
         const tileSet = map.addTilesetImage('duality_tileset', 'duality_tileset');
         const spawnPoint = this._getSpawnPoint(map);
+
+        this.squirrels = this.physics.add.group({
+            collideWorldBounds: true,
+        });
+        this.enemyDetectZones = this.physics.add.staticGroup();
+
         this._addBackground();
         this._addPlayer(spawnPoint);
         this._addEnemies(map);
@@ -228,11 +234,8 @@ export default class StageSceneBase extends Phaser.Scene {
                 }
             }
         );
+
         this.enemiesCollider.active = false;
-        this.enemyZoneCollider = this.physics.add.collider(this.player, this.enemyDetectZones, () =>
-            console.log('oih')
-        );
-        this.enemyZoneCollider.active = true;
     }
 
     _initWaves() {
@@ -326,9 +329,12 @@ export default class StageSceneBase extends Phaser.Scene {
             });
         }
 
+        if (this.enemyDetectZones) {
         this.enemyDetectZones.getChildren().forEach((zone) => {
             zone.update(time, dt);
         });
+        }
+
         this._checkPlayerBounds();
         this._checkEnemyBounds();
         this.waveGroup.preUpdate(time, dt);
