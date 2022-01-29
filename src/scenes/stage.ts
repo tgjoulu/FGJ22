@@ -17,6 +17,9 @@ export default class StageScene extends Phaser.Scene {
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
     private activeWorldSide: WorldSide;
 
+    private drums: Phaser.Sound.BaseSound;
+    private bass: Phaser.Sound.BaseSound;
+
     constructor() {
         super({ key: 'StageScene' });
     }
@@ -29,6 +32,8 @@ export default class StageScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 32,
         });
+        this.load.audio('drums', 'assets/sound/drums.wav');
+        this.load.audio('bass', 'assets/sound/bass.wav');
     }
 
     create() {
@@ -43,6 +48,10 @@ export default class StageScene extends Phaser.Scene {
 
         // DEBUG: may be used but renders weird stuff
         //this._debugRenderTileCollisions(map);
+        const bgDrums = this.sound.add('drums', {loop: true,});
+        const bgBass = this.sound.add('bass', {loop: true,});
+        bgDrums.play({volume: 0.02});
+        bgBass.play({volume: 0.005});
 
         this.cameras.main.setViewport(
             0,
