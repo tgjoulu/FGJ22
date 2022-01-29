@@ -2,6 +2,7 @@ import Constants from '../constants';
 import Player from '../player/player';
 import Wave from '../objects/wave';
 import { Constraint } from 'matter';
+import { Physics } from 'phaser';
 
 enum WorldSide {
     Light,
@@ -23,7 +24,7 @@ export default class StageScene extends Phaser.Scene {
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
 
-    private wave: Wave;
+    waveGroup: Phaser.Physics.Arcade.Group;
 
     constructor() {
         super({ key: 'StageScene' });
@@ -52,6 +53,7 @@ export default class StageScene extends Phaser.Scene {
         this._enableWorld(WorldSide.Light);
         this._enableDebugKeys();
         this._initCamera();
+        this._initWaves();
 
         // DEBUG: may be used but renders weird stuff
         //this._debugRenderTileCollisions(map);
@@ -59,8 +61,6 @@ export default class StageScene extends Phaser.Scene {
         const bgBass = this.sound.add('bass', { loop: true });
         bgDrums.play({ volume: 0.02 });
         bgBass.play({ volume: 0.005 });
-
-        this._createWave();
     }
 
     _restartScene() {
@@ -128,6 +128,14 @@ export default class StageScene extends Phaser.Scene {
         this.darkWorldCollider.active = false;
     }
 
+    _initWaves() {
+      this.waveGroup = this.physics.add.group({
+        runChildUpdate: true,
+        allowGravity: false,
+      });
+      this._createWave();
+    }
+
     _enableWorld(worldSide: WorldSide) {
         this.activeWorldSide = worldSide;
         const darkSide = worldSide == WorldSide.Dark;
@@ -155,16 +163,23 @@ export default class StageScene extends Phaser.Scene {
         });
     }
 
-    _createWave() {
+    _createWave = () => {
         const mapBounds = this.physics.world.bounds;
-        var wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
-        wave.createPlayerCollider(this.player, this._onPlayerWaveCollide);
+        new Wave(
+            this,
+            mapBounds.right,
+            mapBounds.top,
+            mapBounds.height,
+            this.player,
+            this._onPlayerWaveCollide
+        );
     }
 
     update(time: number, dt: number) {
         this.player.update();
         // this.wave.update(time, dt);
         this._checkPlayerBounds();
+        this.waveGroup.preUpdate(time, dt);
     }
 
     _checkPlayerBounds() {
@@ -176,10 +191,10 @@ export default class StageScene extends Phaser.Scene {
     }
 
     _onPlayerWaveCollide = () => {
-      if (this.activeWorldSide == WorldSide.Light) {
-        this._enableWorld(WorldSide.Dark);
-      } else {
-        this._enableWorld(WorldSide.Light);
-      }
+        if (this.activeWorldSide == WorldSide.Light) {
+            this._enableWorld(WorldSide.Dark);
+        } else {
+            this._enableWorld(WorldSide.Light);
+        }
     }
 }

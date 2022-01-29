@@ -1,17 +1,22 @@
 import ArcadePhysicsCallback from 'phaser';
+import Player from '../player/player';
+import StageScene from '../scenes/stage';
 
 export default class Wave extends Phaser.Physics.Arcade.Sprite {
     body: Phaser.Physics.Arcade.Body;
 
     // Constants
-    readonly waveSpeed = 40;
+    readonly waveSpeed = 80;
     readonly debugTarget = false;
 
     waveGroup: Phaser.Physics.Arcade.Group;
+
+    player: Player;
     playerCollider: Phaser.Physics.Arcade.Collider;
     playerCollideCallback: ArcadePhysicsCallback;
+    collisionTimer: Phaser.Time.Clock;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, height: number) {
+    constructor(scene: StageScene, x: number, y: number, height: number, player: Player, overlapCallback: ArcadePhysicsCallback) {
       super(scene, x, y, 'wave');
       scene.add.existing(this);
 
@@ -20,30 +25,44 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
 
       this.setOrigin(0.5, 0);
 
-      scene.physics.add.existing(this);
+      scene.waveGroup.add(this, true);
 
       this.body.setAllowGravity(false);
       this.setPushable(false);
 
       this.setVelocityX(-this.waveSpeed);
+
+      this.player = player;
+      this.playerCollideCallback = overlapCallback;
+      this.createPlayerCollider();
     };
 
 
-    createPlayerCollider(object, callback) {
-      this.playerCollideCallback = callback;
+    createPlayerCollider() {
       this.playerCollider = this.scene.physics.add.overlap(
         this,
-        object,
+        this.player,
         this.overlapCallback
       );
     }
 
-    overlapCallback = (object1, object2) => {
-      this.playerCollider.destroy();
+    overlapCallback = (object1: Phaser.Types.Physics.Arcade.GameObjectWithBody, object2: Phaser.Types.Physics.Arcade.GameObjectWithBody) => {
+      this.playerCollider.active = false;
       this.playerCollideCallback(object1, object2);
     }
 
     update(time:number, dt: number) {
-      // this.x -= dt * this.waveSpeed;
-    };
+        // re-enable player wave collision detection if collider is not active
+        // and player is not touching the wave
+        if (!this.playerCollider.active &&
+            !this.scene.physics.overlap(this, this.player)) {
+            // re-enable wave player collision
+            this.playerCollider.active = true;
+        }
+
+        if (this.x < -40) {
+            console.log("wave destroyed");
+            this.destroy();
+        }
+    }
 }
