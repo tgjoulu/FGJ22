@@ -10,5 +10,6 @@
         "strictPropertyInitialization": false,
         "allowJs": true,
         "lib": ["dom", "es5", "esnext"]
-    }
+    },
+    "exclude": ["node_modules", "src/**/*.tsx"]
 }
