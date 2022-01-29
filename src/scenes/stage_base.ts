@@ -38,7 +38,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private analBassVol: integer;
     private digiDrumVol: integer;
     private digiBassVol: integer;
-    private background: Phaser.GameObjects.Sprite;
+    private background: Phaser.GameObjects.TileSprite;
 
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
@@ -189,7 +189,16 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _addBackground() {
         // center after initlevel
-        this.background = this.add.sprite(0, 0, 'background_light');
+        this.background = this.add.tileSprite(
+            0,
+            0,
+            Constants.DESIGN_WIDTH,
+            Constants.DESIGN_HEIGHT,
+            'background_light'
+        );
+        this.background.setOrigin(0);
+        this.background.setScrollFactor(0.1, 0);
+        this.background.setTilePosition(this.cameras.main.scrollX);
     }
 
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
@@ -199,8 +208,6 @@ export default class StageSceneBase extends Phaser.Scene {
         this.belowDark = tileMap.createLayer('below_dark', tileSet, 0, 0);
         const mapBounds = this.belowLight.getBounds();
         this.physics.world.setBounds(0, 0, mapBounds.width, mapBounds.height);
-        this.background.x = this.physics.world.bounds.x + this.physics.world.bounds.width / 2;
-        this.background.y = this.physics.world.bounds.y + this.physics.world.bounds.height / 2;
     }
 
     _initWorldColliders() {
