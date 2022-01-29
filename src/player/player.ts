@@ -4,7 +4,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private moveRightKey: Phaser.Input.Keyboard.Key;
     private moveLeftKey: Phaser.Input.Keyboard.Key;
     private jumpKey: Phaser.Input.Keyboard.Key;
-    private runSpeed: number = 240;
+    private runSpeed: number = 220;
     private jumpForce: number = 200;
     private acceleration: number = 180;
     private airAcceleration: number = 100;
@@ -31,21 +31,34 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setBounce(0.01);
         this.setDragX(this.drag);
         this.setMaxVelocity(this.runSpeed, this.jumpForce);
+        this._initAnims();
 
         //this.setCollideWorldBounds(true, 0, 0);
         this._bindKeys();
-        this.body.setSize(20, 36);
+        this.body.setSize(18, 28);
+    }
+
+    _initAnims() {
+        this.anims.create({
+            key: 'walk',
+            frameRate: 8,
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+            repeat: -1,
+        });
     }
 
     _bindKeys() {
         this.jumpKey.on('down', () => {
             if (this._canJump()) {
                 this.setVelocityY(-this.jumpForce);
+                this.stop();
+                this.setFrame(0);
             } else if (this._canWallJump()) {
                 this.setVelocityY(-this.wallJumpForceY);
                 this.setVelocityX(this.wallJumpForceX * (this.body.blocked.left ? 1 : -1));
                 this.curTurnDelayMS = this.turnDelayMS;
                 this.setDragX(this.drag);
+                this.setFlipX(this.body.blocked.right);
             }
         });
     }
@@ -65,13 +78,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (this.body.velocity.x < this.turnSpeed) {
                 this.setVelocityX(grounded ? this.turnSpeed : this.airTurnSpeed);
             }
+            if (grounded) {
+                this.play('walk', true);
+            }
+            this.setFlipX(false);
         } else if (this.moveLeftKey.isDown) {
             this.setAccelerationX(grounded ? -this.acceleration : -this.airAcceleration);
             if (this.body.velocity.x > -this.turnSpeed) {
                 this.setVelocityX(grounded ? -this.turnSpeed : -this.airTurnSpeed);
             }
+            this.setFlipX(true);
+            if (grounded) {
+                this.play('walk', true);
+            }
         } else {
             this.setAccelerationX(0);
+            this.stop();
         }
     }
 
