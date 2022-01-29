@@ -25,7 +25,7 @@ const config: Phaser.Types.Core.GameConfig = {
         arcade: {
             debug: true,
             tileBias: 4,
-            gravity: { y: 100 },
+            gravity: { y: 275 },
         },
     },
     title: 'TODO',
