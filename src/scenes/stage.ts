@@ -197,6 +197,9 @@ export default class StageScene extends Phaser.Scene {
 
     update(time: number, dt: number) {
         this.player.update(time, dt);
+        this.squirrels.getChildren().forEach((squirrel) => {
+            squirrel.update(time, dt);
+        });
         this._checkPlayerBounds();
     }
 
