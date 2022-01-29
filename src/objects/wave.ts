@@ -51,7 +51,7 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
       this.playerCollideCallback(object1, object2);
     }
 
-    update(time:number, dt: number) {
+    update(time: number, dt: number) {
         // re-enable player wave collision detection if collider is not active
         // and player is not touching the wave
         if (!this.playerCollider.active &&
@@ -61,7 +61,6 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.x < -40) {
-            console.log("wave destroyed");
             this.destroy();
         }
     }
