@@ -36,6 +36,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private waveTimer: Phaser.Time.Clock;
 
     protected stageName: string = 'pieruperse';
+    protected nextStageName: string;
 
     constructor(config: string | Phaser.Types.Scenes.SettingsConfig) {
         super(config);
@@ -75,6 +76,8 @@ export default class StageSceneBase extends Phaser.Scene {
             }
         });
     }
+
+    sceneFinish() {}
 
     _restartScene() {
         this.scene.restart();
@@ -201,11 +204,11 @@ export default class StageSceneBase extends Phaser.Scene {
             this._restartScene();
         });
         this.stage1Key.on('down', () => {
-            console.log('stage1scene');
+            console.log('debug: Stage1Scene');
             this.scene.start('Stage1Scene');
         });
         this.stage2Key.on('down', () => {
-            console.log('stage2scene');
+            console.log('debug: Stage2Scene');
             this.scene.start('Stage2Scene');
         });
     };
@@ -237,8 +240,19 @@ export default class StageSceneBase extends Phaser.Scene {
         this._checkPlayerBounds();
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0) {
-            console.log('VICTORY! TODO next level');
+            console.log(this.nextStageName);
+            if (this.nextStageName) {
+                this._finishStage();
+            } else {
+                console.log('koko peli on läpi LOL');
+            }
         }
+    }
+
+    _finishStage() {
+        // TODO näytä jotain paskaa
+        console.log('Finish stage, TODO transition juttu');
+        this.scene.start(this.nextStageName);
     }
 
     _checkPlayerBounds() {
