@@ -157,13 +157,12 @@ export default class StageScene extends Phaser.Scene {
     }
 
     update(time: number, dt: number) {
-        this.player.update();
+        this.player.update(time, dt);
         this.wave.update(time, dt);
         this._checkPlayerBounds();
     }
 
     _checkPlayerBounds() {
-        console.log(this.player.y + ' vs ' + this.physics.world.bounds.bottom);
         if (this.player.y > this.physics.world.bounds.bottom) {
             console.log('RESTART');
             this._restartScene();
