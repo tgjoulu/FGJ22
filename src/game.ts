@@ -1,9 +1,9 @@
 import 'phaser';
 
-import MainScene from './scenes/main';
-import StageScene from './scenes/stage';
 import Constants from './constants';
 import UIScene from './scenes/uiscene';
+import Stage1Scene from './scenes/stage_1';
+import Stage2Scene from './scenes/stage_2';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -20,13 +20,13 @@ const config: Phaser.Types.Core.GameConfig = {
         height: Constants.DESIGN_HEIGHT,
         zoom: 2,
     },
-    scene: [StageScene, UIScene],
+    scene: [Stage1Scene, Stage2Scene, UIScene],
     physics: {
         default: 'arcade',
         arcade: {
             debug: true,
             tileBias: 4,
-            gravity: { y: 300 },
+            gravity: { y: 275 },
         },
     },
     title: 'TODO',
