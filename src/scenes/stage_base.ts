@@ -68,10 +68,10 @@ export default class StageSceneBase extends Phaser.Scene {
                 child.onWorldChange(activeWorld);
             });
 
-            if(activeWorld == 0) {
-                this.background.setTexture("background_light");
+            if (activeWorld == 0) {
+                this.background.setTexture('background_light');
             } else {
-                this.background.setTexture("background_dark");
+                this.background.setTexture('background_dark');
             }
         });
     }
@@ -128,7 +128,8 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _addBackground() {
-        this.background = this.add.sprite(640, 500, "background_light");
+        // center after initlevel
+        this.background = this.add.sprite(0, 0, 'background_light');
     }
 
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
@@ -137,12 +138,9 @@ export default class StageSceneBase extends Phaser.Scene {
         this.aboveDark = tileMap.createLayer('above_dark', tileSet, 0, 0);
         this.belowDark = tileMap.createLayer('below_dark', tileSet, 0, 0);
         const mapBounds = this.belowLight.getBounds();
-        this.physics.world.setBounds(
-            mapBounds.x * Constants.SCALE,
-            mapBounds.y * Constants.SCALE,
-            mapBounds.width * Constants.SCALE,
-            mapBounds.height * Constants.SCALE
-        );
+        this.physics.world.setBounds(0, 0, mapBounds.width, mapBounds.height);
+        this.background.x = this.physics.world.bounds.x + this.physics.world.bounds.width / 2;
+        this.background.y = this.physics.world.bounds.y + this.physics.world.bounds.height / 2;
     }
 
     _initWorldColliders() {
