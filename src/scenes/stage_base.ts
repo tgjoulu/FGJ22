@@ -132,6 +132,8 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _restartScene() {
+        this.bgAnalogMusicLoops.map(s => s.stop());
+        this.bgDigitalMusicLoops.map(s => s.stop());
         this.scene.restart();
     }
 
