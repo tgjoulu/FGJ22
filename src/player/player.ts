@@ -18,7 +18,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     _bindKeys() {
         this.jumpKey.on('down', () => {
-            console.log(this.body.touching);
             if (this._isGrounded()) {
                 this.setVelocityY(this.jumpForce);
             }
