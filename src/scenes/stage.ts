@@ -12,9 +12,13 @@ export default class StageScene extends Phaser.Scene {
     private aboveDark: Phaser.Tilemaps.TilemapLayer;
     private belowDark: Phaser.Tilemaps.TilemapLayer;
     private player: Player;
-
+    private worldSwapKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
+    private activeWorldSide: WorldSide;
+
+    private drums: Phaser.Sound.BaseSound;
+    private bass: Phaser.Sound.BaseSound;
 
     constructor() {
         super({ key: 'StageScene' });
@@ -28,6 +32,8 @@ export default class StageScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 32,
         });
+        this.load.audio('drums', 'assets/sound/drums.wav');
+        this.load.audio('bass', 'assets/sound/bass.wav');
     }
 
     create() {
@@ -38,9 +44,14 @@ export default class StageScene extends Phaser.Scene {
         this._initLevel(map, tileSet);
         this._initWorldColliders();
         this._enableWorld(WorldSide.Light);
+        this._enableDebugKeys();
 
         // DEBUG: may be used but renders weird stuff
         //this._debugRenderTileCollisions(map);
+        const bgDrums = this.sound.add('drums', {loop: true,});
+        const bgBass = this.sound.add('bass', {loop: true,});
+        bgDrums.play({volume: 0.02});
+        bgBass.play({volume: 0.005});
 
         this.cameras.main.setViewport(
             0,
@@ -97,6 +108,7 @@ export default class StageScene extends Phaser.Scene {
     }
 
     _enableWorld(worldSide: WorldSide) {
+        this.activeWorldSide = worldSide;
         const darkSide = worldSide == WorldSide.Dark;
         const lightSide = !darkSide;
 
@@ -107,6 +119,15 @@ export default class StageScene extends Phaser.Scene {
         this.lightWorldCollider.active = lightSide;
         this.belowLight.visible = lightSide;
         this.aboveLight.visible = lightSide;
+    }
+
+    _enableDebugKeys() {
+        this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+        this.worldSwapKey.on('down', () => {
+            this._enableWorld(
+                this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light
+            );
+        });
     }
 
     update() {}
