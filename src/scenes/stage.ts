@@ -64,10 +64,10 @@ export default class StageScene extends Phaser.Scene {
     _addPlayer(spawn: Phaser.Math.Vector2) {
         this.player = new Player(this, spawn.x!, spawn.y!, 'player', 0);
 
-        this.physics.add.existing(this.player);
+        this.physics.add.existing(this.player, false);
         this.add.existing(this.player);
 
-        this.player.init();
+        this.player.init(this);
     }
 
     _getSpawnPoint(tileMap: Phaser.Tilemaps.Tilemap): Phaser.Math.Vector2 {
@@ -121,5 +121,7 @@ export default class StageScene extends Phaser.Scene {
         });
     }
 
-    update() {}
+    update() {
+        this.player.update();
+    }
 }
