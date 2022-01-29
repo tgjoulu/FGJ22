@@ -14,6 +14,7 @@ export default class StageScene extends Phaser.Scene {
     private belowDark: Phaser.Tilemaps.TilemapLayer;
     private player: Player;
     private worldSwapKey: Phaser.Input.Keyboard.Key;
+    private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
     private activeWorldSide: WorldSide;
@@ -60,6 +61,10 @@ export default class StageScene extends Phaser.Scene {
 
         var mapBounds = this.aboveLight.getBounds();
         this.wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
+    }
+
+    _restartScene() {
+        this.scene.restart();
     }
 
     _debugRenderTileCollisions(tileMap: Phaser.Tilemaps.Tilemap) {
@@ -135,10 +140,14 @@ export default class StageScene extends Phaser.Scene {
 
     _enableDebugKeys() {
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+        this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
             this._enableWorld(
                 this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light
             );
+        });
+        this.restartKey.on('down', () => {
+            this._restartScene();
         });
     }
 
