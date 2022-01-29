@@ -26,5 +26,10 @@ export default class LookupZone extends ArcadePhysicsCallback.GameObjects.Graphi
 
     update(time: number, dt: number) {
         this.setPosition(this.parentObject.x, this.parentObject.y);
+
+        // Destroy zone if parent is destroyed
+        if (!this.parentObject.body) {
+            this.destroy();
+        }
     }
 }
