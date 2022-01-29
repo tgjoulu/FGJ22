@@ -32,9 +32,9 @@ export default class StageScene extends Phaser.Scene {
         // TODO get from args somehow
         this.load.image('duality_tilemap', 'assets/sprites/duality_tilemap.png');
         this.load.tilemapTiledJSON('map', 'assets/tilemaps/test_stage/test_stage.json');
-        this.load.spritesheet('player', 'assets/sprites/tileset_dev.png', {
-            frameWidth: 32,
-            frameHeight: 32,
+        this.load.spritesheet('player', 'assets/sprites/character.png', {
+            frameWidth: 40,
+            frameHeight: 40,
         });
         this.load.audio('drums', 'assets/sound/drums.wav');
         this.load.audio('bass', 'assets/sound/bass.wav');
