@@ -159,21 +159,23 @@ export default class StageSceneBase extends Phaser.Scene {
             // Not in every stage => ok
             return;
         }
-        this.squirrels = this.physics.add.group({
-            collideWorldBounds: true,
-        });
 
         collectables.objects.forEach((obj) => {
             // TODO oravalle waypointit = obj.x -> obj.x + obj.width
-            console.log;
-            this.squirrels.add(new Squirrel(this, obj.x! + obj.width! / 2, obj.y!, 'left'));
+            const directions = ['left', 'right'] as ['left', 'right'];
+            const direction = directions[Math.floor(Math.random() * 2)];
+            const squirrel = new Squirrel(
+                this,
+                obj.x! + obj.width! / 2,
+                obj.y!,
+                direction,
+                this.player
+            );
+            this.squirrels.add(squirrel);
+            this.enemyDetectZones.add(new LookupZone(this, 100, 200, squirrel, this.player));
         });
 
-        this.enemyDetectZones = this.physics.add.staticGroup();
         // Add vihulaiset
-        const squirrel = new Squirrel(this, 100, 200, 'left');
-        this.squirrels.add(squirrel);
-        this.enemyDetectZones.add(new LookupZone(this, 100, 200, squirrel));
 
         this.add.existing(this.squirrels);
         this.add.existing(this.enemyDetectZones);
@@ -330,9 +332,9 @@ export default class StageSceneBase extends Phaser.Scene {
         }
 
         if (this.enemyDetectZones) {
-        this.enemyDetectZones.getChildren().forEach((zone) => {
-            zone.update(time, dt);
-        });
+            this.enemyDetectZones.getChildren().forEach((zone) => {
+                zone.update(time, dt);
+            });
         }
 
         this._checkPlayerBounds();
@@ -361,13 +363,15 @@ export default class StageSceneBase extends Phaser.Scene {
         }
     }
     _checkEnemyBounds() {
-        this.squirrels.getChildren().forEach((child) => {
-            const squirrel = child as Squirrel;
-            if (squirrel.y > this.physics.world.bounds.bottom - 20) {
-                this.squirrels.remove(squirrel);
-                squirrel.destroy();
-            }
-        });
+        if (this.squirrels) {
+            this.squirrels.getChildren().forEach((child) => {
+                const squirrel = child as Squirrel;
+                if (squirrel.y > this.physics.world.bounds.bottom - 20) {
+                    this.squirrels.remove(squirrel);
+                    squirrel.destroy();
+                }
+            });
+        }
     }
 
     _onPlayerWaveCollide = () => {
