@@ -4,7 +4,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(0, 0, 'Hello World', { font: '"Press Start 2P"' });
+        this.add.text(0, 0, 'Hello World', { font: '"Press Start 2P"', color: "#000" });
     }
 
     update() {}

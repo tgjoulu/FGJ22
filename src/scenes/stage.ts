@@ -1,5 +1,6 @@
 import Constants from '../constants';
 import Player from '../player/player';
+import Wave from '../objects/wave';
 
 enum WorldSide {
     Light,
@@ -20,6 +21,8 @@ export default class StageScene extends Phaser.Scene {
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
 
+    private wave: Phaser.GameObjects.Sprite;
+
     constructor() {
         super({ key: 'StageScene' });
     }
@@ -34,6 +37,7 @@ export default class StageScene extends Phaser.Scene {
         });
         this.load.audio('drums', 'assets/sound/drums.wav');
         this.load.audio('bass', 'assets/sound/bass.wav');
+        this.load.image('waveSprite', 'assets/sprites/wave.png');
     }
 
     create() {
@@ -53,6 +57,16 @@ export default class StageScene extends Phaser.Scene {
         const bgBass = this.sound.add('bass', { loop: true });
         bgDrums.play({ volume: 0.02 });
         bgBass.play({ volume: 0.005 });
+
+        this.cameras.main.setViewport(
+            0,
+            -this.aboveLight.getBounds().bottom + Constants.TILE_SIZE,
+            Constants.WINDOW_WIDTH,
+            Constants.WINDOW_HEIGHT
+        );
+
+        var mapBounds = this.aboveLight.getBounds();
+        this.wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
     }
 
     _debugRenderTileCollisions(tileMap: Phaser.Tilemaps.Tilemap) {
@@ -135,7 +149,8 @@ export default class StageScene extends Phaser.Scene {
         });
     }
 
-    update() {
+    update(time: number, dt: number) {
         this.player.update();
+        this.wave.update(time, dt);
     }
 }
