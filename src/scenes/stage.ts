@@ -25,6 +25,7 @@ export default class StageScene extends Phaser.Scene {
     private bass: Phaser.Sound.BaseSound;
 
     waveGroup: Phaser.Physics.Arcade.Group;
+    private waveTimer: Phaser.Time.Clock;
 
     constructor() {
         super({ key: 'StageScene' });
@@ -134,6 +135,11 @@ export default class StageScene extends Phaser.Scene {
         allowGravity: false,
       });
       this._createWave();
+      this.time.addEvent({
+          delay: 5000, //ms
+          callback: () => this._createWave(),
+          loop: true,
+      });
     }
 
     _enableWorld(worldSide: WorldSide) {
