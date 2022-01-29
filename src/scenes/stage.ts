@@ -58,13 +58,6 @@ export default class StageScene extends Phaser.Scene {
         bgDrums.play({ volume: 0.02 });
         bgBass.play({ volume: 0.005 });
 
-        this.cameras.main.setViewport(
-            0,
-            -this.aboveLight.getBounds().bottom + Constants.TILE_SIZE,
-            Constants.WINDOW_WIDTH,
-            Constants.WINDOW_HEIGHT
-        );
-
         var mapBounds = this.aboveLight.getBounds();
         this.wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
     }
