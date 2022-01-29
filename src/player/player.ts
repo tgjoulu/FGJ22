@@ -19,7 +19,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private wallJumpForceX: number = 180;
     private wallJumpTriggerEaseMS = 150; // Should be less than turnDelayMS
     private groundTouchTriggerEaseMS = 100;
-    private lastWallTouch: number = 0;
+    private lastWallTouchLeft: number = 0;
+    private lastWallTouchRight: number = 0;
     private lastGroundTouch: number = 0;
     private curTime: number = 0;
 
@@ -58,10 +59,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setFrame(0);
             } else if (this._canWallJump()) {
                 this.setVelocityY(-this.wallJumpForceY);
-                this.setVelocityX(this.wallJumpForceX * (this.body.blocked.left ? 1 : -1));
+                const wallJumpLeft = this.lastWallTouchLeft > this.lastWallTouchRight;
+                this.setVelocityX(this.wallJumpForceX * (wallJumpLeft ? 1 : -1));
+                this.setAccelerationX(this.airAcceleration * (wallJumpLeft ? 1 : -1));
                 this.curTurnDelayMS = this.turnDelayMS;
                 this.setDragX(this.drag);
                 this.setFlipX(this.body.blocked.right);
+                console.log(this.body.acceleration.x);
             }
         });
     }
@@ -111,15 +115,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     _updateWallTouch(time: number) {
-        if (this.body.blocked.left || this.body.blocked.right) {
-            this.lastWallTouch = time;
+        if (this.body.blocked.left) {
+            this.lastWallTouchLeft = time;
+        }
+        if (this.body.blocked.right) {
+            this.lastWallTouchRight = time;
         }
     }
 
     _canWallJump(): boolean {
         return (
             this.curTurnDelayMS <= 0 &&
-            this.curTime - this.lastWallTouch < this.wallJumpTriggerEaseMS
+            (this.curTime - this.lastWallTouchLeft < this.wallJumpTriggerEaseMS ||
+                this.curTime - this.lastWallTouchRight < this.wallJumpTriggerEaseMS)
         );
     }
 }
