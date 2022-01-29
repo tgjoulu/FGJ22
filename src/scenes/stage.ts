@@ -17,7 +17,9 @@ export default class StageScene extends Phaser.Scene {
     private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
+    private enemiesCollider: Phaser.Physics.Arcade.Collider;
     private activeWorldSide: WorldSide;
+    private squirrels: Phaser.Physics.Arcade.Group;
 
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
@@ -36,6 +38,10 @@ export default class StageScene extends Phaser.Scene {
             frameWidth: 40,
             frameHeight: 40,
         });
+        this.load.spritesheet('squirrel', 'assets/sprites/squirrel.png', {
+            frameWidth: 40,
+            frameHeight: 40,
+        });
         this.load.audio('drums', 'assets/sound/drums.wav');
         this.load.audio('bass', 'assets/sound/bass.wav');
         this.load.image('waveSprite', 'assets/sprites/wave.png');
@@ -46,6 +52,7 @@ export default class StageScene extends Phaser.Scene {
         const tileSet = map.addTilesetImage('duality_tilemap', 'duality_tilemap');
         const spawnPoint = this._getSpawnPoint(map);
         this._addPlayer(spawnPoint);
+        this._addEnemies();
         this._initLevel(map, tileSet);
         this._initWorldColliders();
         this._enableWorld(WorldSide.Light);
@@ -94,6 +101,19 @@ export default class StageScene extends Phaser.Scene {
         this.player.init(this);
     }
 
+    _addEnemies() {
+        this.squirrels = this.physics.add.group({
+            collideWorldBounds: true,
+        });
+
+        // Add vihulaiset
+        var squirrel = this.squirrels.create(200, 600, 'squirrel');
+        var squirrel2 = this.squirrels.create(400, 600, 'squirrel');
+        var squirrel3 = this.squirrels.create(600, 600, 'squirrel');
+
+        this.add.existing(this.squirrels);
+    }
+
     _getSpawnPoint(tileMap: Phaser.Tilemaps.Tilemap): Phaser.Math.Vector2 {
         const spawn = tileMap.getObjectLayer('spawn').objects[0];
         if (!spawn) {
@@ -126,6 +146,11 @@ export default class StageScene extends Phaser.Scene {
 
         this.lightWorldCollider.active = false;
         this.darkWorldCollider.active = false;
+
+        this.enemiesCollider = this.physics.add.collider(this.squirrels, this.player);
+        this.physics.add.collider(this.belowDark, this.squirrels);
+        this.physics.add.collider(this.belowLight, this.squirrels);
+        this.enemiesCollider.active = false;
     }
 
     _enableWorld(worldSide: WorldSide) {
@@ -146,9 +171,10 @@ export default class StageScene extends Phaser.Scene {
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
-            this._enableWorld(
-                this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light
-            );
+            const activeWorldSide =
+                this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light;
+            this._enableWorld(activeWorldSide);
+            this.registry.set('activeWorldSide', activeWorldSide);
         });
         this.restartKey.on('down', () => {
             this._restartScene();
