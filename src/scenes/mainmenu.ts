@@ -8,7 +8,6 @@ export default class MainMenuScene extends Phaser.Scene {
 
     private mainmenuMusic: Phaser.Sound.BaseSound;
 
-
     constructor() {
         super('main-menu');
     }
@@ -32,6 +31,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.image('duality_tileset', 'assets/sprites/duality_tileset.png');
         this.load.tilemapTiledJSON('stage_1_map', `assets/tilemaps/stage_1.json`);
         this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
+        this.load.tilemapTiledJSON('stage_3_map', `assets/tilemaps/stage_3.json`);
         this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,
@@ -48,8 +48,10 @@ export default class MainMenuScene extends Phaser.Scene {
             frameWidth: 40,
             frameHeight: 40,
         });
-        this.load.audio('drums', 'assets/sound/drums.wav');
-        this.load.audio('bass', 'assets/sound/bass.wav');
+        this.load.audio('analDrums', 'assets/sound/AnalogDrums.wav');
+        this.load.audio('analBass', 'assets/sound/AnalogBass.wav');
+        this.load.audio('digiDrums', 'assets/sound/drums.wav');
+        this.load.audio('digiBass', 'assets/sound/bass.wav');
 
         this.load.audio('mainmenu_music', 'assets/sound/mainmenu.mp3');
 
@@ -65,7 +67,7 @@ export default class MainMenuScene extends Phaser.Scene {
         const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
 
         const _mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
-        _mainmenuMusic.play({volume: 0.5});
+        _mainmenuMusic.play({ volume: 0.5 });
         this.mainmenuMusic = _mainmenuMusic;
 
         this.buttons.push(startButton);

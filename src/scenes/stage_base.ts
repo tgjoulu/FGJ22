@@ -19,6 +19,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private worldSwapKey: Phaser.Input.Keyboard.Key;
     private stage1Key: Phaser.Input.Keyboard.Key;
     private stage2Key: Phaser.Input.Keyboard.Key;
+    private stage3Key: Phaser.Input.Keyboard.Key;
     private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
@@ -49,35 +50,7 @@ export default class StageSceneBase extends Phaser.Scene {
     protected stageName: string = 'pieruperse';
     protected nextStageName: string;
 
-    preload() {
-        // TODO get from args somehow
-        this.load.image('duality_tilemap', 'assets/sprites/duality_tilemap.png');
-        this.load.tilemapTiledJSON('map', 'assets/tilemaps/test_stage/test_stage.json');
-        this.load.spritesheet('player', 'assets/sprites/character_running.png', {
-            frameWidth: 40,
-            frameHeight: 40,
-        });
-
-        this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet('squirrel', 'assets/sprites/squirrel.png', {
-            frameWidth: 40,
-            frameHeight: 40,
-        });
-        this.load.spritesheet('wolf', 'assets/sprites/wolf.png', {
-            frameWidth: 40,
-            frameHeight: 40,
-        });
-
-        this.load.audio('analDrums', 'assets/sound/AnalogDrums.wav');
-        this.load.audio('analBass', 'assets/sound/AnalogBass.wav');
-        this.load.audio('digiDrums', 'assets/sound/drums.wav');
-        this.load.audio('digiBass', 'assets/sound/bass.wav');
-
-        this.load.image('waveSprite', 'assets/sprites/wave.png');
-    }
+    preload() {}
 
     constructor(config: string | Phaser.Types.Scenes.SettingsConfig) {
         super(config);
@@ -89,7 +62,7 @@ export default class StageSceneBase extends Phaser.Scene {
         const spawnPoint = this._getSpawnPoint(map);
         this._addBackground();
         this._addPlayer(spawnPoint);
-        this._addEnemies();
+        this._addEnemies(map);
         this._initLevel(map, tileSet);
         this._initWorldColliders();
         this._enableWorld(WorldSide.Light);
@@ -120,9 +93,11 @@ export default class StageSceneBase extends Phaser.Scene {
         bgAnalBass.play({ volume: this.analBassVol });
 
         this.events.on('onWorldChange', (activeWorld: 0 | 1) => {
-            (this.squirrels.getChildren() as Squirrel[]).forEach((child) => {
-                child.onWorldChange(activeWorld);
-            });
+            if (this.squirrels) {
+                (this.squirrels.getChildren() as Squirrel[]).forEach((child) => {
+                    child.onWorldChange(activeWorld);
+                });
+            }
 
             if (activeWorld == 0) {
                 this.background.setTexture('background_light');
@@ -167,13 +142,21 @@ export default class StageSceneBase extends Phaser.Scene {
         this.player.init(this);
     }
 
-    _addEnemies() {
+    _addEnemies(tileMap: Phaser.Tilemaps.Tilemap) {
+        const collectables = tileMap.getObjectLayer('enemies');
+        if (!collectables) {
+            // Not in every stage => ok
+            return;
+        }
         this.squirrels = this.physics.add.group({
             collideWorldBounds: true,
         });
 
-        // Add vihulaiset
-        this.squirrels.add(new Squirrel(this, 200, 600, 'left'));
+        collectables.objects.forEach((obj) => {
+            // TODO oravalle waypointit = obj.x -> obj.x + obj.width
+            console.log;
+            this.squirrels.add(new Squirrel(this, obj.x! + obj.width! / 2, obj.y!, 'left'));
+        });
 
         this.add.existing(this.squirrels);
     }
@@ -256,6 +239,7 @@ export default class StageSceneBase extends Phaser.Scene {
     _enableDebugKeys = () => {
         this.stage1Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
         this.stage2Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
+        this.stage3Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
@@ -274,6 +258,10 @@ export default class StageSceneBase extends Phaser.Scene {
         this.stage2Key.on('down', () => {
             console.log('debug: Stage2Scene');
             this.scene.start('Stage2Scene');
+        });
+        this.stage3Key.on('down', () => {
+            console.log('debug: Stage3Scene');
+            this.scene.start('Stage3Scene');
         });
     };
 
@@ -301,9 +289,11 @@ export default class StageSceneBase extends Phaser.Scene {
 
     update(time: number, dt: number) {
         this.player.update(time, dt);
-        this.squirrels.getChildren().forEach((squirrel) => {
-            squirrel.update(time, dt);
-        });
+        if (this.squirrels) {
+            this.squirrels.getChildren().forEach((squirrel) => {
+                squirrel.update(time, dt);
+            });
+        }
         this._checkPlayerBounds();
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0) {

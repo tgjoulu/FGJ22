@@ -65,7 +65,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.curTurnDelayMS = this.turnDelayMS;
                 this.setDragX(this.drag);
                 this.setFlipX(this.body.blocked.right);
-                console.log(this.body.acceleration.x);
             }
         });
     }
