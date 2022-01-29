@@ -58,7 +58,7 @@ export default class StageSceneBase extends Phaser.Scene {
             frameHeight: 40,
         });
 
-        this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
+        this.load.spritesheet('collectable', 'assets/sprites/crystal_sheet.png', {
             frameWidth: 32,
             frameHeight: 32,
         });
