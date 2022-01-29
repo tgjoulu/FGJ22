@@ -38,7 +38,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private analBassVol: integer;
     private digiDrumVol: integer;
     private digiBassVol: integer;
-    private background: Phaser.GameObjects.Sprite;
+    private background: Phaser.GameObjects.TileSprite;
 
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
@@ -47,6 +47,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private waveTimer: Phaser.Time.Clock;
 
     protected stageName: string = 'pieruperse';
+    protected nextStageName: string;
 
     preload() {
         // TODO get from args somehow
@@ -57,7 +58,7 @@ export default class StageSceneBase extends Phaser.Scene {
             frameHeight: 40,
         });
 
-        this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
+        this.load.spritesheet('collectable', 'assets/sprites/crystal_sheet.png', {
             frameWidth: 32,
             frameHeight: 32,
         });
@@ -131,9 +132,11 @@ export default class StageSceneBase extends Phaser.Scene {
         });
     }
 
+    sceneFinish() {}
+
     _restartScene() {
-        this.bgAnalogMusicLoops.map(s => s.stop());
-        this.bgDigitalMusicLoops.map(s => s.stop());
+        this.bgAnalogMusicLoops.map((s) => s.stop());
+        this.bgDigitalMusicLoops.map((s) => s.stop());
         this.scene.restart();
     }
 
@@ -185,7 +188,17 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _addBackground() {
-        this.background = this.add.sprite(640, 500, 'background_light');
+        // center after initlevel
+        this.background = this.add.tileSprite(
+            0,
+            0,
+            Constants.DESIGN_WIDTH,
+            Constants.DESIGN_HEIGHT,
+            'background_light'
+        );
+        this.background.setOrigin(0);
+        this.background.setScrollFactor(0.1, 0);
+        this.background.setTilePosition(this.cameras.main.scrollX);
     }
 
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
@@ -194,12 +207,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.aboveDark = tileMap.createLayer('above_dark', tileSet, 0, 0);
         this.belowDark = tileMap.createLayer('below_dark', tileSet, 0, 0);
         const mapBounds = this.belowLight.getBounds();
-        this.physics.world.setBounds(
-            mapBounds.x * Constants.SCALE,
-            mapBounds.y * Constants.SCALE,
-            mapBounds.width * Constants.SCALE,
-            mapBounds.height * Constants.SCALE
-        );
+        this.physics.world.setBounds(0, 0, mapBounds.width, mapBounds.height);
     }
 
     _initWorldColliders() {
@@ -260,11 +268,11 @@ export default class StageSceneBase extends Phaser.Scene {
             this._restartScene();
         });
         this.stage1Key.on('down', () => {
-            console.log('stage1scene');
+            console.log('debug: Stage1Scene');
             this.scene.start('Stage1Scene');
         });
         this.stage2Key.on('down', () => {
-            console.log('stage2scene');
+            console.log('debug: Stage2Scene');
             this.scene.start('Stage2Scene');
         });
     };
@@ -299,8 +307,19 @@ export default class StageSceneBase extends Phaser.Scene {
         this._checkPlayerBounds();
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0) {
-            console.log('VICTORY! TODO next level');
+            console.log(this.nextStageName);
+            if (this.nextStageName) {
+                this._finishStage();
+            } else {
+                console.log('koko peli on läpi LOL');
+            }
         }
+    }
+
+    _finishStage() {
+        // TODO näytä jotain paskaa
+        console.log('Finish stage, TODO transition juttu');
+        this.scene.start(this.nextStageName);
     }
 
     _checkPlayerBounds() {
