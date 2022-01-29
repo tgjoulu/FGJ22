@@ -45,20 +45,14 @@ export default class StageScene extends Phaser.Scene {
         this._initWorldColliders();
         this._enableWorld(WorldSide.Light);
         this._enableDebugKeys();
+        this._initCamera();
 
         // DEBUG: may be used but renders weird stuff
         //this._debugRenderTileCollisions(map);
-        const bgDrums = this.sound.add('drums', {loop: true,});
-        const bgBass = this.sound.add('bass', {loop: true,});
-        bgDrums.play({volume: 0.02});
-        bgBass.play({volume: 0.005});
-
-        this.cameras.main.setViewport(
-            0,
-            -this.aboveLight.getBounds().bottom + Constants.TILE_SIZE,
-            Constants.WINDOW_WIDTH,
-            Constants.WINDOW_HEIGHT
-        );
+        const bgDrums = this.sound.add('drums', { loop: true });
+        const bgBass = this.sound.add('bass', { loop: true });
+        bgDrums.play({ volume: 0.02 });
+        bgBass.play({ volume: 0.005 });
     }
 
     _debugRenderTileCollisions(tileMap: Phaser.Tilemaps.Tilemap) {
@@ -68,6 +62,17 @@ export default class StageScene extends Phaser.Scene {
             collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles
             faceColor: new Phaser.Display.Color(40, 39, 37, 255), // Colliding face edges
         });
+    }
+
+    _initCamera() {
+        if (!this.belowLight) {
+            console.error('Initialize layers first lol');
+        }
+        const worldBounds = this.belowLight.getBounds();
+        this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
+        console.log(worldBounds);
+        this.cameras.main.startFollow(this.player);
+        this.cameras.main.startFollow(this.player, false, 0.1, 0.1, 0, 0);
     }
 
     _addPlayer(spawn: Phaser.Math.Vector2) {
