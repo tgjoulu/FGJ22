@@ -4,6 +4,7 @@ import Wave from '../objects/wave';
 import Collectable from '../objects/collectable';
 import Squirrel from '../objects/squirrel/squirrel';
 import Stage2Scene from './stage_2';
+import LookupZone from '../objects/squirrel/lookupzone';
 
 enum WorldSide {
     Light,
@@ -27,6 +28,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private activeWorldSide: WorldSide;
     private collectableCount: number;
     private squirrels: Phaser.Physics.Arcade.Group;
+    private enemyDetectZones: Phaser.Physics.Arcade.StaticGroup;
 
     private digiDrums: Phaser.Sound.BaseSound;
     private digiBass: Phaser.Sound.BaseSound;
@@ -158,7 +160,14 @@ export default class StageSceneBase extends Phaser.Scene {
             this.squirrels.add(new Squirrel(this, obj.x! + obj.width! / 2, obj.y!, 'left'));
         });
 
+        this.enemyDetectZones = this.physics.add.staticGroup();
+        // Add vihulaiset
+        const squirrel = new Squirrel(this, 100, 200, 'left');
+        this.squirrels.add(squirrel);
+        this.enemyDetectZones.add(new LookupZone(this, 200, 600, squirrel));
+
         this.add.existing(this.squirrels);
+        this.add.existing(this.enemyDetectZones);
     }
 
     _getSpawnPoint(tileMap: Phaser.Tilemaps.Tilemap): Phaser.Math.Vector2 {
@@ -289,11 +298,16 @@ export default class StageSceneBase extends Phaser.Scene {
 
     update(time: number, dt: number) {
         this.player.update(time, dt);
+
         if (this.squirrels) {
             this.squirrels.getChildren().forEach((squirrel) => {
                 squirrel.update(time, dt);
             });
         }
+
+        this.enemyDetectZones.getChildren().forEach((zone) => {
+            zone.update(time, dt);
+        });
         this._checkPlayerBounds();
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0) {
