@@ -41,38 +41,8 @@ export default class StageSceneBase extends Phaser.Scene {
         super(config);
     }
 
-    preload() {
-        // TODO get from args somehow
-        this.load.image('duality_tileset', 'assets/sprites/duality_tileset.png');
-        this.load.tilemapTiledJSON('map', `assets/tilemaps/${this.stageName}.json`);
-        this.load.spritesheet('player', 'assets/sprites/character_running.png', {
-            frameWidth: 40,
-            frameHeight: 40,
-        });
-        this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet('squirrel', 'assets/sprites/squirrel.png', {
-            frameWidth: 40,
-            frameHeight: 40,
-        });
-        this.load.spritesheet('wolf', 'assets/sprites/wolf.png', {
-            frameWidth: 40,
-            frameHeight: 40,
-        });
-        this.load.audio('drums', 'assets/sound/drums.wav');
-        this.load.audio('bass', 'assets/sound/bass.wav');
-        this.load.image('waveSprite', 'assets/sprites/wave.png');
-
-        this.load.image('background_light', 'assets/sprites/background_light.png');
-        this.load.image('background_dark', 'assets/sprites/background_dark.png');
-
-
-    }
-
     create() {
-        const map = this.make.tilemap({ key: 'map' });
+        const map = this.make.tilemap({ key: `${this.stageName}_map` });
         const tileSet = map.addTilesetImage('duality_tileset', 'duality_tileset');
         const spawnPoint = this._getSpawnPoint(map);
         this._addBackground();

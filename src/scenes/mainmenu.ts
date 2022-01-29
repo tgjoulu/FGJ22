@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 export default class MainMenuScene extends Phaser.Scene {
-    private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+    private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private buttons: Phaser.GameObjects.Image[] = [];
     private selectedButtonIndex = 0;
     private buttonSelector!: Phaser.GameObjects.Image;
@@ -15,7 +15,42 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     preload() {
+        let centerX = this.cameras.main.width / 2;
+        let centerY = this.cameras.main.height / 2;
+        let progBox = this.add.rectangle(centerX, centerY, 320, 50, 0x222222, 0.8);
+        let progBar = this.add.rectangle(centerX - 150, centerY, 0, 40, 0xffffff, 1);
+
+        this.load.on('progress', (value: number) => {
+            progBar.width = 300 * value;
+        });
+
         this.load.image('start', 'assets/sprites/start.png');
+
+        this.load.image('duality_tileset', 'assets/sprites/duality_tileset.png');
+        this.load.tilemapTiledJSON('stage_1_map', `assets/tilemaps/stage_1.json`);
+        this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
+        this.load.spritesheet('player', 'assets/sprites/character_running.png', {
+            frameWidth: 40,
+            frameHeight: 40,
+        });
+        this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+        });
+        this.load.spritesheet('squirrel', 'assets/sprites/squirrel.png', {
+            frameWidth: 40,
+            frameHeight: 40,
+        });
+        this.load.spritesheet('wolf', 'assets/sprites/wolf.png', {
+            frameWidth: 40,
+            frameHeight: 40,
+        });
+        this.load.audio('drums', 'assets/sound/drums.wav');
+        this.load.audio('bass', 'assets/sound/bass.wav');
+        this.load.image('waveSprite', 'assets/sprites/wave.png');
+
+        this.load.image('background_light', 'assets/sprites/background_light.png');
+        this.load.image('background_dark', 'assets/sprites/background_dark.png');
     }
 
     create() {
@@ -31,7 +66,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.selectButton(0);
 
         startButton.on('selected', () => {
-            this.scene.start('MainScene');
+            this.scene.start('Stage1Scene');
         });
     }
 
@@ -68,9 +103,9 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     update() {
-        const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up!);
-        const downJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.down!);
-        const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space!);
+        const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up);
+        const downJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.down);
+        const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space);
 
         if (upJustPressed) {
             this.selectNextButton(-1);
