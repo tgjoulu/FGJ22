@@ -35,7 +35,7 @@ export default class StageScene extends Phaser.Scene {
         // TODO get from args somehow
         this.load.image('duality_tilemap', 'assets/sprites/duality_tilemap.png');
         this.load.tilemapTiledJSON('map', 'assets/tilemaps/test_stage/test_stage.json');
-        this.load.spritesheet('player', 'assets/sprites/character.png', {
+        this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,
         });
@@ -196,8 +196,7 @@ export default class StageScene extends Phaser.Scene {
     }
 
     update(time: number, dt: number) {
-        this.player.update();
-        // this.wave.update(time, dt);
+        this.player.update(time, dt);
         this._checkPlayerBounds();
     }
 
@@ -211,7 +210,7 @@ export default class StageScene extends Phaser.Scene {
     _onPlayerWaveCollide = () => {
         if (this.activeWorldSide == WorldSide.Light) {
             this._enableWorld(WorldSide.Dark);
-            this.registry.set('activeWorldSide', WorldSide.Dark);
+            this.events.emit('onWorldChange', WorldSide.Dark);
         } else {
             this._enableWorld(WorldSide.Light);
             this.events.emit('onWorldChange', WorldSide.Light);
