@@ -1,6 +1,7 @@
 import Constants from '../constants';
 import Player from '../player/player';
 import Wave from '../objects/wave';
+import { Constraint } from 'matter';
 
 enum WorldSide {
     Light,
@@ -14,6 +15,7 @@ export default class StageScene extends Phaser.Scene {
     private belowDark: Phaser.Tilemaps.TilemapLayer;
     private player: Player;
     private worldSwapKey: Phaser.Input.Keyboard.Key;
+    private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
     private activeWorldSide: WorldSide;
@@ -31,9 +33,9 @@ export default class StageScene extends Phaser.Scene {
         // TODO get from args somehow
         this.load.image('duality_tilemap', 'assets/sprites/duality_tilemap.png');
         this.load.tilemapTiledJSON('map', 'assets/tilemaps/test_stage/test_stage.json');
-        this.load.spritesheet('player', 'assets/sprites/tileset_dev.png', {
-            frameWidth: 32,
-            frameHeight: 32,
+        this.load.spritesheet('player', 'assets/sprites/character.png', {
+            frameWidth: 40,
+            frameHeight: 40,
         });
         this.load.audio('drums', 'assets/sound/drums.wav');
         this.load.audio('bass', 'assets/sound/bass.wav');
@@ -62,6 +64,10 @@ export default class StageScene extends Phaser.Scene {
         this.wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
     }
 
+    _restartScene() {
+        this.scene.restart();
+    }
+
     _debugRenderTileCollisions(tileMap: Phaser.Tilemaps.Tilemap) {
         const debugGraphics = this.add.graphics().setAlpha(0.75);
         tileMap.renderDebug(debugGraphics, {
@@ -77,8 +83,6 @@ export default class StageScene extends Phaser.Scene {
         }
         const worldBounds = this.belowLight.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        console.log(worldBounds);
-        this.cameras.main.startFollow(this.player);
         this.cameras.main.startFollow(this.player, false, 0.1, 0.1, 0, 0);
     }
 
@@ -105,7 +109,13 @@ export default class StageScene extends Phaser.Scene {
         this.belowLight = tileMap.createLayer('below_light', tileSet, 0, 0);
         this.aboveDark = tileMap.createLayer('above_dark', tileSet, 0, 0);
         this.belowDark = tileMap.createLayer('below_dark', tileSet, 0, 0);
-        this.physics.world.bounds = this.belowLight.getBounds();
+        const mapBounds = this.belowLight.getBounds();
+        this.physics.world.setBounds(
+            mapBounds.x * Constants.SCALE,
+            mapBounds.y * Constants.SCALE,
+            mapBounds.width * Constants.SCALE,
+            mapBounds.height * Constants.SCALE
+        );
     }
 
     _initWorldColliders() {
@@ -135,15 +145,28 @@ export default class StageScene extends Phaser.Scene {
 
     _enableDebugKeys() {
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+        this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
             this._enableWorld(
                 this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light
             );
+        });
+        this.restartKey.on('down', () => {
+            this._restartScene();
         });
     }
 
     update(time: number, dt: number) {
         this.player.update();
         this.wave.update(time, dt);
+        this._checkPlayerBounds();
+    }
+
+    _checkPlayerBounds() {
+        console.log(this.player.y + ' vs ' + this.physics.world.bounds.bottom);
+        if (this.player.y > this.physics.world.bounds.bottom) {
+            console.log('RESTART');
+            this._restartScene();
+        }
     }
 }
