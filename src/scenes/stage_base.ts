@@ -27,6 +27,17 @@ export default class StageSceneBase extends Phaser.Scene {
     private collectableCount: number;
     private squirrels: Phaser.Physics.Arcade.Group;
 
+    private digiDrums: Phaser.Sound.BaseSound;
+    private digiBass: Phaser.Sound.BaseSound;
+    private analDrums: Phaser.Sound.BaseSound;
+    private analBass: Phaser.Sound.BaseSound;
+    private bgAnalogMusicLoops : Phaser.Sound.BaseSound[];
+    private bgDigitalMusicLoops : Phaser.Sound.BaseSound[];
+
+    private analDrumVol: integer;
+    private analBassVol: integer;
+    private digiDrumVol: integer;
+    private digiBassVol: integer;
     private background: Phaser.GameObjects.Sprite;
 
     private drums: Phaser.Sound.BaseSound;
@@ -37,18 +48,15 @@ export default class StageSceneBase extends Phaser.Scene {
 
     protected stageName: string = 'pieruperse';
 
-    constructor(config: string | Phaser.Types.Scenes.SettingsConfig) {
-        super(config);
-    }
-
     preload() {
         // TODO get from args somehow
-        this.load.image('duality_tileset', 'assets/sprites/duality_tileset.png');
-        this.load.tilemapTiledJSON('map', `assets/tilemaps/${this.stageName}.json`);
+        this.load.image('duality_tilemap', 'assets/sprites/duality_tilemap.png');
+        this.load.tilemapTiledJSON('map', 'assets/tilemaps/test_stage/test_stage.json');
         this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,
         });
+
         this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
             frameWidth: 32,
             frameHeight: 32,
@@ -61,18 +69,21 @@ export default class StageSceneBase extends Phaser.Scene {
             frameWidth: 40,
             frameHeight: 40,
         });
-        this.load.audio('drums', 'assets/sound/drums.wav');
-        this.load.audio('bass', 'assets/sound/bass.wav');
+
+        this.load.audio('analDrums', 'assets/sound/AnalogDrums.wav');
+        this.load.audio('analBass', 'assets/sound/AnalogBass.wav');
+        this.load.audio('digiDrums', 'assets/sound/drums.wav');
+        this.load.audio('digiBass', 'assets/sound/bass.wav');
+
         this.load.image('waveSprite', 'assets/sprites/wave.png');
+    }
 
-        this.load.image('background_light', 'assets/sprites/background_light.png');
-        this.load.image('background_dark', 'assets/sprites/background_dark.png');
-
-
+    constructor(config: string | Phaser.Types.Scenes.SettingsConfig) {
+        super(config);
     }
 
     create() {
-        const map = this.make.tilemap({ key: 'map' });
+        const map = this.make.tilemap({ key: `${this.stageName}_map` });
         const tileSet = map.addTilesetImage('duality_tileset', 'duality_tileset');
         const spawnPoint = this._getSpawnPoint(map);
         this._addBackground();
@@ -88,10 +99,24 @@ export default class StageSceneBase extends Phaser.Scene {
 
         // DEBUG: may be used but renders weird stuff
         //this._debugRenderTileCollisions(map);
-        const bgDrums = this.sound.add('drums', { loop: true });
-        const bgBass = this.sound.add('bass', { loop: true });
-        bgDrums.play({ volume: 0.02 });
-        bgBass.play({ volume: 0.005 });
+        const bgAnalDrums = this.sound.add('analDrums', { loop: false });
+        const bgAnalBass = this.sound.add('analBass', { loop: false });
+        const bgDigiDrums = this.sound.add('digiDrums', { loop: false });
+        const bgDigiBass = this.sound.add('digiBass', { loop: false });
+
+        this.analDrumVol = 0.05;
+        this.analBassVol = 1;
+        this.digiDrumVol = 0.05;
+        this.digiBassVol = 0.2;
+
+        this.bgAnalogMusicLoops = [ bgAnalDrums, bgAnalBass ];
+        this.bgDigitalMusicLoops = [ bgDigiDrums, bgDigiBass ];
+
+        this.bgAnalogMusicLoops.map(snd => snd.on('complete', this._onBgSoundComplete));
+        this.bgDigitalMusicLoops.map(snd => snd.on('complete', this._onBgSoundComplete));
+
+        bgAnalDrums.play({ volume: this.analDrumVol });
+        bgAnalBass.play({ volume: this.analBassVol });
 
         this.events.on('onWorldChange', (activeWorld: 0 | 1) => {
             (this.squirrels.getChildren() as Squirrel[]).forEach((child) => {
@@ -294,4 +319,63 @@ export default class StageSceneBase extends Phaser.Scene {
         this.collectableCount--;
         console.log(this.collectableCount);
     };
+
+    _onBgSoundComplete = (soundRef: any) => {
+        let soundFound : Boolean = false;
+        if(this.activeWorldSide == WorldSide.Light) {
+            for(const foo of this.bgAnalogMusicLoops) {
+                if(soundRef.key === foo.key) {
+                    console.log(`Looping sound ${soundRef.key}`);
+                    soundFound = true;
+                    soundRef.play();
+                }
+            }
+        } else {
+            for(const foo of this.bgDigitalMusicLoops) {
+                if(soundRef.key === foo.key) {
+                    console.log(`Looping sound ${soundRef.key}`);
+                    soundFound = true;
+                    soundRef.play();
+                }           
+            }
+        }
+        if(!soundFound) {
+            console.log(`Should swap: ${soundRef.key}`);
+            if(this.activeWorldSide == WorldSide.Light) {
+                const keys = this.bgDigitalMusicLoops.map(x => x.key);
+                if(keys.indexOf(soundRef.key) > -1) {
+                    if(soundRef.key == 'digiDrums') {
+                        this.bgAnalogMusicLoops[0].play({ volume: this.analDrumVol });
+                        this.bgDigitalMusicLoops[0].stop();
+                        console.log('Switching to analDrums');
+                    } else if (soundRef.key == 'digiBass') {
+                        this.bgAnalogMusicLoops[1].play({ volume: this.analBassVol });
+                        this.bgDigitalMusicLoops[1].stop();
+                        console.log('Switching to analBass');
+                    } else {
+                        console.log(`Not found: ${soundRef.key}`);
+                    }
+                } else {
+                    console.log(`${soundRef.key} not in ${keys}`);
+                }
+            } else {
+                const keys = this.bgAnalogMusicLoops.map(x => x.key);
+                if(keys.indexOf(soundRef.key) > -1) {
+                    if(soundRef.key == 'analDrums') {
+                        this.bgDigitalMusicLoops[0].play({ volume: this.digiDrumVol });
+                        this.bgAnalogMusicLoops[0].stop();
+                        console.log('Switching to digiDrums');
+                    } else if (soundRef.key == 'analBass') {
+                        this.bgDigitalMusicLoops[1].play({ volume: this.digiBassVol });
+                        this.bgAnalogMusicLoops[1].stop();
+                        console.log('Switching to digiBass');
+                    } else {
+                        console.log(`Not found: ${soundRef.key}`);
+                    }
+                } else {
+                    console.log(`${soundRef.key} not in ${keys}`);
+                }
+            }
+        }
+    }
 }
