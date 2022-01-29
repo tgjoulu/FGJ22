@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
+    private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private moveRightKey: Phaser.Input.Keyboard.Key;
     private moveLeftKey: Phaser.Input.Keyboard.Key;
     private jumpKey: Phaser.Input.Keyboard.Key;
@@ -25,6 +26,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     body: Phaser.Physics.Arcade.Body;
 
     public init(scene: Phaser.Scene) {
+        this.cursors = scene.input.keyboard.createCursorKeys();
         this.moveRightKey = scene.input.keyboard.addKey('D');
         this.moveLeftKey = scene.input.keyboard.addKey('A');
         this.jumpKey = scene.input.keyboard.addKey('SPACE');
