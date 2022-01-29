@@ -38,6 +38,8 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
             this.stop();
         });
 
+        this._initAnims();
+
         // Add lookup zone
         this.lookupZone = scene.add.graphics({ fillStyle: { color: 0xff0000 } });
         this.lookupZone.displayOriginX = 80;
@@ -49,6 +51,17 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
             .setAllowGravity(false)
             .setCircle(80);
         this.lookupZone.on('onCollide', () => console.log('lol'));
+    }
+
+    _initAnims() {
+        this.anims.create({
+            key: 'walk',
+            frameRate: 4,
+            frames: this.anims.generateFrameNumbers('squirrel', { start: 0, end: 2 }),
+            repeat: -1,
+        });
+
+        this.play('walk', true);
     }
 
     update(time: number, dt: number) {
