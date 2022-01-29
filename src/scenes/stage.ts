@@ -24,7 +24,7 @@ export default class StageScene extends Phaser.Scene {
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
 
-    private wave: Phaser.GameObjects.Sprite;
+    private wave: Wave;
 
     constructor() {
         super({ key: 'StageScene' });
@@ -66,8 +66,7 @@ export default class StageScene extends Phaser.Scene {
         bgDrums.play({ volume: 0.02 });
         bgBass.play({ volume: 0.005 });
 
-        var mapBounds = this.aboveLight.getBounds();
-        this.wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
+        this._createWave();
     }
 
     _restartScene() {
@@ -181,9 +180,15 @@ export default class StageScene extends Phaser.Scene {
         });
     }
 
+    _createWave() {
+        const mapBounds = this.physics.world.bounds;
+        var wave = new Wave(this, mapBounds.right, mapBounds.top, mapBounds.height);
+        wave.createPlayerCollider(this.player, this._onPlayerWaveCollide);
+    }
+
     update(time: number, dt: number) {
         this.player.update();
-        this.wave.update(time, dt);
+        // this.wave.update(time, dt);
         this._checkPlayerBounds();
     }
 
@@ -193,5 +198,13 @@ export default class StageScene extends Phaser.Scene {
             console.log('RESTART');
             this._restartScene();
         }
+    }
+
+    _onPlayerWaveCollide = () => {
+      if (this.activeWorldSide == WorldSide.Light) {
+        this._enableWorld(WorldSide.Dark);
+      } else {
+        this._enableWorld(WorldSide.Light);
+      }
     }
 }
