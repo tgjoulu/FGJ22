@@ -26,6 +26,8 @@ export default class StageScene extends Phaser.Scene {
     private collectableCount: number;
     private squirrels: Phaser.Physics.Arcade.Group;
 
+    private background: Phaser.GameObjects.Sprite;
+
     private drums: Phaser.Sound.BaseSound;
     private bass: Phaser.Sound.BaseSound;
 
@@ -59,12 +61,18 @@ export default class StageScene extends Phaser.Scene {
         this.load.audio('drums', 'assets/sound/drums.wav');
         this.load.audio('bass', 'assets/sound/bass.wav');
         this.load.image('waveSprite', 'assets/sprites/wave.png');
+
+        this.load.image('background_light', 'assets/sprites/background_light.png');
+        this.load.image('background_dark', 'assets/sprites/background_dark.png');
+
+
     }
 
     create() {
         const map = this.make.tilemap({ key: 'map' });
         const tileSet = map.addTilesetImage('duality_tilemap', 'duality_tilemap');
         const spawnPoint = this._getSpawnPoint(map);
+        this._addBackground();
         this._addPlayer(spawnPoint);
         this._addEnemies();
         this._initLevel(map, tileSet);
@@ -86,6 +94,12 @@ export default class StageScene extends Phaser.Scene {
             (this.squirrels.getChildren() as Squirrel[]).forEach((child) => {
                 child.onWorldChange(activeWorld);
             });
+
+            if(activeWorld == 0) {
+                this.background.setTexture("background_light");
+            } else {
+                this.background.setTexture("background_dark");
+            }
         });
     }
 
@@ -138,6 +152,10 @@ export default class StageScene extends Phaser.Scene {
             return new Phaser.Math.Vector2(0, 0);
         }
         return new Phaser.Math.Vector2(spawn.x!, spawn.y!);
+    }
+
+    _addBackground() {
+        this.background = this.add.sprite(640, 500, "background_light");
     }
 
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
