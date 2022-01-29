@@ -1,7 +1,6 @@
 import Constants from '../constants';
 import Player from '../player/player';
 import Wave from '../objects/wave';
-import { Constraint } from 'matter';
 
 enum WorldSide {
     Light,
