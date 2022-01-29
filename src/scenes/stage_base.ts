@@ -130,7 +130,7 @@ export default class StageSceneBase extends Phaser.Scene {
         }
         const worldBounds = this.belowLight.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        this.cameras.main.startFollow(this.player, false, 0.1, 0.1, 0, 0);
+        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -128);
     }
 
     _addPlayer(spawn: Phaser.Math.Vector2) {
@@ -175,7 +175,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.background = this.add.tileSprite(
             0,
             0,
-            Constants.DESIGN_WIDTH,
+            1280,
             Constants.DESIGN_HEIGHT,
             'background_light'
         );
