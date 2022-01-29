@@ -2,7 +2,7 @@ import Constants from '../constants';
 import Player from '../player/player';
 import Wave from '../objects/wave';
 import Collectable from '../objects/collectable';
-import Squirrel from '../objects/squirrel';
+import Squirrel from '../objects/squirrel/squirrel';
 import Stage2Scene from './stage_2';
 
 enum WorldSide {
@@ -31,8 +31,8 @@ export default class StageSceneBase extends Phaser.Scene {
     private digiBass: Phaser.Sound.BaseSound;
     private analDrums: Phaser.Sound.BaseSound;
     private analBass: Phaser.Sound.BaseSound;
-    private bgAnalogMusicLoops : Phaser.Sound.BaseSound[];
-    private bgDigitalMusicLoops : Phaser.Sound.BaseSound[];
+    private bgAnalogMusicLoops: Phaser.Sound.BaseSound[];
+    private bgDigitalMusicLoops: Phaser.Sound.BaseSound[];
 
     private analDrumVol: integer;
     private analBassVol: integer;
@@ -109,11 +109,11 @@ export default class StageSceneBase extends Phaser.Scene {
         this.digiDrumVol = 0.05;
         this.digiBassVol = 0.2;
 
-        this.bgAnalogMusicLoops = [ bgAnalDrums, bgAnalBass ];
-        this.bgDigitalMusicLoops = [ bgDigiDrums, bgDigiBass ];
+        this.bgAnalogMusicLoops = [bgAnalDrums, bgAnalBass];
+        this.bgDigitalMusicLoops = [bgDigiDrums, bgDigiBass];
 
-        this.bgAnalogMusicLoops.map(snd => snd.on('complete', this._onBgSoundComplete));
-        this.bgDigitalMusicLoops.map(snd => snd.on('complete', this._onBgSoundComplete));
+        this.bgAnalogMusicLoops.map((snd) => snd.on('complete', this._onBgSoundComplete));
+        this.bgDigitalMusicLoops.map((snd) => snd.on('complete', this._onBgSoundComplete));
 
         bgAnalDrums.play({ volume: this.analDrumVol });
         bgAnalBass.play({ volume: this.analBassVol });
@@ -123,10 +123,10 @@ export default class StageSceneBase extends Phaser.Scene {
                 child.onWorldChange(activeWorld);
             });
 
-            if(activeWorld == 0) {
-                this.background.setTexture("background_light");
+            if (activeWorld == 0) {
+                this.background.setTexture('background_light');
             } else {
-                this.background.setTexture("background_dark");
+                this.background.setTexture('background_dark');
             }
         });
     }
@@ -168,7 +168,7 @@ export default class StageSceneBase extends Phaser.Scene {
         });
 
         // Add vihulaiset
-        this.squirrels.add(new Squirrel(this, 200, 600));
+        this.squirrels.add(new Squirrel(this, 200, 600, 'left'));
 
         this.add.existing(this.squirrels);
     }
@@ -183,7 +183,7 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _addBackground() {
-        this.background = this.add.sprite(640, 500, "background_light");
+        this.background = this.add.sprite(640, 500, 'background_light');
     }
 
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
@@ -324,30 +324,30 @@ export default class StageSceneBase extends Phaser.Scene {
     };
 
     _onBgSoundComplete = (soundRef: any) => {
-        let soundFound : Boolean = false;
-        if(this.activeWorldSide == WorldSide.Light) {
-            for(const foo of this.bgAnalogMusicLoops) {
-                if(soundRef.key === foo.key) {
+        let soundFound: Boolean = false;
+        if (this.activeWorldSide == WorldSide.Light) {
+            for (const foo of this.bgAnalogMusicLoops) {
+                if (soundRef.key === foo.key) {
                     console.log(`Looping sound ${soundRef.key}`);
                     soundFound = true;
                     soundRef.play();
                 }
             }
         } else {
-            for(const foo of this.bgDigitalMusicLoops) {
-                if(soundRef.key === foo.key) {
+            for (const foo of this.bgDigitalMusicLoops) {
+                if (soundRef.key === foo.key) {
                     console.log(`Looping sound ${soundRef.key}`);
                     soundFound = true;
                     soundRef.play();
-                }           
+                }
             }
         }
-        if(!soundFound) {
+        if (!soundFound) {
             console.log(`Should swap: ${soundRef.key}`);
-            if(this.activeWorldSide == WorldSide.Light) {
-                const keys = this.bgDigitalMusicLoops.map(x => x.key);
-                if(keys.indexOf(soundRef.key) > -1) {
-                    if(soundRef.key == 'digiDrums') {
+            if (this.activeWorldSide == WorldSide.Light) {
+                const keys = this.bgDigitalMusicLoops.map((x) => x.key);
+                if (keys.indexOf(soundRef.key) > -1) {
+                    if (soundRef.key == 'digiDrums') {
                         this.bgAnalogMusicLoops[0].play({ volume: this.analDrumVol });
                         this.bgDigitalMusicLoops[0].stop();
                         console.log('Switching to analDrums');
@@ -362,9 +362,9 @@ export default class StageSceneBase extends Phaser.Scene {
                     console.log(`${soundRef.key} not in ${keys}`);
                 }
             } else {
-                const keys = this.bgAnalogMusicLoops.map(x => x.key);
-                if(keys.indexOf(soundRef.key) > -1) {
-                    if(soundRef.key == 'analDrums') {
+                const keys = this.bgAnalogMusicLoops.map((x) => x.key);
+                if (keys.indexOf(soundRef.key) > -1) {
+                    if (soundRef.key == 'analDrums') {
                         this.bgDigitalMusicLoops[0].play({ volume: this.digiDrumVol });
                         this.bgAnalogMusicLoops[0].stop();
                         console.log('Switching to digiDrums');
@@ -380,5 +380,5 @@ export default class StageSceneBase extends Phaser.Scene {
                 }
             }
         }
-    }
+    };
 }
