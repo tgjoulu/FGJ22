@@ -6,6 +6,9 @@ export default class MainMenuScene extends Phaser.Scene {
     private selectedButtonIndex = 0;
     private buttonSelector!: Phaser.GameObjects.Image;
 
+    private mainmenuMusic: Phaser.Sound.BaseSound;
+
+
     constructor() {
         super('main-menu');
     }
@@ -47,6 +50,9 @@ export default class MainMenuScene extends Phaser.Scene {
         });
         this.load.audio('drums', 'assets/sound/drums.wav');
         this.load.audio('bass', 'assets/sound/bass.wav');
+
+        this.load.audio('mainmenu_music', 'assets/sound/mainmenu.mp3');
+
         this.load.image('waveSprite', 'assets/sprites/wave.png');
 
         this.load.image('background_light', 'assets/sprites/background_light.png');
@@ -57,6 +63,9 @@ export default class MainMenuScene extends Phaser.Scene {
         const { width, height } = this.scale;
         const startButton = this.add.image(width * 0.5, height * 0.4, 'start');
         const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
+
+        const mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
+        mainmenuMusic.play({volume: 0.5});
 
         this.buttons.push(startButton);
         this.buttons.push(anotherButton);
