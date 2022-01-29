@@ -32,6 +32,9 @@ const config: Phaser.Types.Core.GameConfig = {
         },
     },
     title: 'TODO',
+    input: {
+      gamepad: true,
+    },
 };
 
 window.addEventListener('load', () => {

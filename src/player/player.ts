@@ -1,10 +1,16 @@
 import { Scene } from 'phaser';
 
+interface Keys {
+    left: Phaser.Input.Keyboard.Key,
+    right: Phaser.Input.Keyboard.Key,
+    up: Phaser.Input.Keyboard.Key,
+}
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    private moveRightKey: Phaser.Input.Keyboard.Key;
-    private moveLeftKey: Phaser.Input.Keyboard.Key;
-    private jumpKey: Phaser.Input.Keyboard.Key;
+    private keys: Keys;
+    private gamepad: Phaser.Input.Gamepad.Gamepad;
+
     private runSpeed: number = 220;
     private jumpForce: number = 200;
     private acceleration: number = 180;
@@ -27,9 +33,20 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     public init(scene: Phaser.Scene) {
         this.cursors = scene.input.keyboard.createCursorKeys();
-        this.moveRightKey = scene.input.keyboard.addKey('D');
-        this.moveLeftKey = scene.input.keyboard.addKey('A');
-        this.jumpKey = scene.input.keyboard.addKey('SPACE');
+        if (scene.input.gamepad.total) {
+            this.gamepad = scene.input.gamepad.getPad(0);
+        } else {
+            scene.input.gamepad.once('connected', (pad: Phaser.Input.Gamepad.Gamepad) => {
+                this.gamepad = pad;
+            });
+        }
+
+        this.keys = scene.input.keyboard.addKeys({
+          left: Phaser.Input.Keyboard.KeyCodes.A,
+          right: Phaser.Input.Keyboard.KeyCodes.D,
+          up: Phaser.Input.Keyboard.KeyCodes.W,
+        }) as Keys;
+
         this.setBounce(0.01);
         this.setDragX(this.drag);
         this.setMaxVelocity(this.runSpeed, this.jumpForce);
@@ -51,19 +68,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     _bindKeys() {
-        this.jumpKey.on('down', () => {
-            if (this._canJump()) {
-                this.setVelocityY(-this.jumpForce);
-                this.stop();
-                this.setFrame(0);
-            } else if (this._canWallJump()) {
-                this.setVelocityY(-this.wallJumpForceY);
-                this.setVelocityX(this.wallJumpForceX * (this.body.blocked.left ? 1 : -1));
-                this.curTurnDelayMS = this.turnDelayMS;
-                this.setDragX(this.drag);
-                this.setFlipX(this.body.blocked.right);
-            }
-        });
+    }
+
+    isRightKeyDown(): boolean {
+        return (this.gamepad && this.gamepad.right) || this.keys.right.isDown || this.cursors.right.isDown;
+    }
+
+    isLeftKeyDown(): boolean {
+        return (this.gamepad && this.gamepad.left) || this.keys.left.isDown || this.cursors.left.isDown;
+    }
+
+    isJumpKeyDown(): boolean {
+        return (this.gamepad && (this.gamepad.A || this.gamepad.up)) || this.cursors.space.isDown || this.cursors.up.isDown;
     }
 
     update(time: number, dt: number) {
@@ -76,7 +92,20 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this._updateWallTouch(time);
         const grounded = this.body.blocked.down;
         this.setDragX(grounded ? this.drag : this.airDrag);
-        if (this.moveRightKey.isDown) {
+        if  (this.isJumpKeyDown()) {
+            if (this._canJump()) {
+                this.setVelocityY(-this.jumpForce);
+                this.stop();
+                this.setFrame(0);
+            } else if (this._canWallJump()) {
+                this.setVelocityY(-this.wallJumpForceY);
+                this.setVelocityX(this.wallJumpForceX * (this.body.blocked.left ? 1 : -1));
+                this.curTurnDelayMS = this.turnDelayMS;
+                this.setDragX(this.drag);
+                this.setFlipX(this.body.blocked.right);
+            }
+        }
+        if (this.isRightKeyDown()) {
             this.setAccelerationX(grounded ? this.acceleration : this.airAcceleration);
             if (this.body.velocity.x < this.turnSpeed) {
                 this.setVelocityX(grounded ? this.turnSpeed : this.airTurnSpeed);
@@ -85,7 +114,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.play('walk', true);
             }
             this.setFlipX(false);
-        } else if (this.moveLeftKey.isDown) {
+        } else if (this.isLeftKeyDown()) {
             this.setAccelerationX(grounded ? -this.acceleration : -this.airAcceleration);
             if (this.body.velocity.x > -this.turnSpeed) {
                 this.setVelocityX(grounded ? -this.turnSpeed : -this.airTurnSpeed);
