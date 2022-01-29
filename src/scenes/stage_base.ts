@@ -3,21 +3,22 @@ import Player from '../player/player';
 import Wave from '../objects/wave';
 import Collectable from '../objects/collectable';
 import Squirrel from '../objects/squirrel';
-import { Constraint } from 'matter';
-import { Physics } from 'phaser';
+import Stage2Scene from './stage_2';
 
 enum WorldSide {
     Light,
     Dark,
 }
 
-export default class StageScene extends Phaser.Scene {
+export default class StageSceneBase extends Phaser.Scene {
     private aboveLight: Phaser.Tilemaps.TilemapLayer;
     private belowLight: Phaser.Tilemaps.TilemapLayer;
     private aboveDark: Phaser.Tilemaps.TilemapLayer;
     private belowDark: Phaser.Tilemaps.TilemapLayer;
     private player: Player;
     private worldSwapKey: Phaser.Input.Keyboard.Key;
+    private stage1Key: Phaser.Input.Keyboard.Key;
+    private stage2Key: Phaser.Input.Keyboard.Key;
     private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
@@ -37,13 +38,15 @@ export default class StageScene extends Phaser.Scene {
     private analBassVol: integer;
     private digiDrumVol: integer;
     private digiBassVol: integer;
+    private background: Phaser.GameObjects.Sprite;
+
+    private drums: Phaser.Sound.BaseSound;
+    private bass: Phaser.Sound.BaseSound;
 
     waveGroup: Phaser.Physics.Arcade.Group;
     private waveTimer: Phaser.Time.Clock;
 
-    constructor() {
-        super({ key: 'StageScene' });
-    }
+    protected stageName: string = 'pieruperse';
 
     preload() {
         // TODO get from args somehow
@@ -75,10 +78,15 @@ export default class StageScene extends Phaser.Scene {
         this.load.image('waveSprite', 'assets/sprites/wave.png');
     }
 
+    constructor(config: string | Phaser.Types.Scenes.SettingsConfig) {
+        super(config);
+    }
+
     create() {
-        const map = this.make.tilemap({ key: 'map' });
-        const tileSet = map.addTilesetImage('duality_tilemap', 'duality_tilemap');
+        const map = this.make.tilemap({ key: `${this.stageName}_map` });
+        const tileSet = map.addTilesetImage('duality_tileset', 'duality_tileset');
         const spawnPoint = this._getSpawnPoint(map);
+        this._addBackground();
         this._addPlayer(spawnPoint);
         this._addEnemies();
         this._initLevel(map, tileSet);
@@ -114,6 +122,12 @@ export default class StageScene extends Phaser.Scene {
             (this.squirrels.getChildren() as Squirrel[]).forEach((child) => {
                 child.onWorldChange(activeWorld);
             });
+
+            if(activeWorld == 0) {
+                this.background.setTexture("background_light");
+            } else {
+                this.background.setTexture("background_dark");
+            }
         });
     }
 
@@ -168,6 +182,10 @@ export default class StageScene extends Phaser.Scene {
         return new Phaser.Math.Vector2(spawn.x!, spawn.y!);
     }
 
+    _addBackground() {
+        this.background = this.add.sprite(640, 500, "background_light");
+    }
+
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
         this.aboveLight = tileMap.createLayer('above_light', tileSet, 0, 0);
         this.belowLight = tileMap.createLayer('below_light', tileSet, 0, 0);
@@ -199,16 +217,16 @@ export default class StageScene extends Phaser.Scene {
     }
 
     _initWaves() {
-      this.waveGroup = this.physics.add.group({
-        runChildUpdate: true,
-        allowGravity: false,
-      });
-      this._createWave();
-      this.time.addEvent({
-          delay: 5000, //ms
-          callback: () => this._createWave(),
-          loop: true,
-      });
+        this.waveGroup = this.physics.add.group({
+            runChildUpdate: true,
+            allowGravity: false,
+        });
+        this._createWave();
+        this.time.addEvent({
+            delay: 5000, //ms
+            callback: () => this._createWave(),
+            loop: true,
+        });
     }
 
     _enableWorld(worldSide: WorldSide) {
@@ -226,6 +244,8 @@ export default class StageScene extends Phaser.Scene {
     }
 
     _enableDebugKeys = () => {
+        this.stage1Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
+        this.stage2Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
@@ -236,6 +256,14 @@ export default class StageScene extends Phaser.Scene {
         });
         this.restartKey.on('down', () => {
             this._restartScene();
+        });
+        this.stage1Key.on('down', () => {
+            console.log('stage1scene');
+            this.scene.start('Stage1Scene');
+        });
+        this.stage2Key.on('down', () => {
+            console.log('stage2scene');
+            this.scene.start('Stage2Scene');
         });
     };
 
@@ -249,7 +277,7 @@ export default class StageScene extends Phaser.Scene {
             this.player,
             this._onPlayerWaveCollide
         );
-    }
+    };
 
     _createCollectables(tileMap: Phaser.Tilemaps.Tilemap) {
         this.collectableCount = 0;

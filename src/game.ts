@@ -1,8 +1,10 @@
 import 'phaser';
 
 import MainScene from './scenes/main';
-import StageScene from './scenes/stage';
+import MainMenuScene from './scenes/mainmenu';
 import Constants from './constants';
+import Stage1Scene from './scenes/stage_1';
+import Stage2Scene from './scenes/stage_2';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -19,7 +21,7 @@ const config: Phaser.Types.Core.GameConfig = {
         height: Constants.DESIGN_HEIGHT,
         zoom: 2,
     },
-    scene: [StageScene],
+    scene: [MainMenuScene, Stage1Scene, Stage2Scene],
     physics: {
         default: 'arcade',
         arcade: {
