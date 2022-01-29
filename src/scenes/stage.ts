@@ -1,6 +1,7 @@
 import Constants from '../constants';
 import Player from '../player/player';
 import Wave from '../objects/wave';
+import { Constraint } from 'matter';
 
 enum WorldSide {
     Light,
@@ -82,8 +83,6 @@ export default class StageScene extends Phaser.Scene {
         }
         const worldBounds = this.belowLight.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        console.log(worldBounds);
-        this.cameras.main.startFollow(this.player);
         this.cameras.main.startFollow(this.player, false, 0.1, 0.1, 0, 0);
     }
 
@@ -110,7 +109,13 @@ export default class StageScene extends Phaser.Scene {
         this.belowLight = tileMap.createLayer('below_light', tileSet, 0, 0);
         this.aboveDark = tileMap.createLayer('above_dark', tileSet, 0, 0);
         this.belowDark = tileMap.createLayer('below_dark', tileSet, 0, 0);
-        this.physics.world.bounds = this.belowLight.getBounds();
+        const mapBounds = this.belowLight.getBounds();
+        this.physics.world.setBounds(
+            mapBounds.x * Constants.SCALE,
+            mapBounds.y * Constants.SCALE,
+            mapBounds.width * Constants.SCALE,
+            mapBounds.height * Constants.SCALE
+        );
     }
 
     _initWorldColliders() {
@@ -154,5 +159,14 @@ export default class StageScene extends Phaser.Scene {
     update(time: number, dt: number) {
         this.player.update();
         this.wave.update(time, dt);
+        this._checkPlayerBounds();
+    }
+
+    _checkPlayerBounds() {
+        console.log(this.player.y + ' vs ' + this.physics.world.bounds.bottom);
+        if (this.player.y > this.physics.world.bounds.bottom) {
+            console.log('RESTART');
+            this._restartScene();
+        }
     }
 }
