@@ -68,7 +68,10 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         }
 
         if (this.x < -40) {
+<<<<<<< HEAD
             console.log('wave destroyed');
+=======
+>>>>>>> c283758791cdba080e5531bd47e5b6c2aba9cf4d
             this.destroy();
         }
     }
