@@ -140,7 +140,7 @@ export default class StageSceneBase extends Phaser.Scene {
         }
         const worldBounds = this.lightLayer.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -64);
+        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -32);
     }
 
     _addPlayer(spawn: Phaser.Math.Vector2) {
