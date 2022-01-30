@@ -290,6 +290,8 @@ export default class StageSceneBase extends Phaser.Scene {
                 this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light;
             this._enableWorld(activeWorldSide);
             this.events.emit('onWorldChange', activeWorldSide);
+            // Flash on world change
+            this.cameras.main.flash(500, 115, 30, 62);
         });
         this.restartKey.on('down', () => {
             this._restartScene();
@@ -403,9 +405,11 @@ export default class StageSceneBase extends Phaser.Scene {
         if (this.activeWorldSide == WorldSide.Light) {
             this._enableWorld(WorldSide.Dark);
             this.events.emit('onWorldChange', WorldSide.Dark);
+            this.cameras.main.flash(500, 115, 30, 62);
         } else {
             this._enableWorld(WorldSide.Light);
             this.events.emit('onWorldChange', WorldSide.Light);
+            this.cameras.main.flash(500, 115, 30, 62);
         }
     };
 
