@@ -1,12 +1,15 @@
 import Phaser from 'phaser';
 
+import Input from '../input';
+
 export default class MainMenuScene extends Phaser.Scene {
-    private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private buttons: Phaser.GameObjects.Image[] = [];
     private selectedButtonIndex = 0;
     private buttonSelector!: Phaser.GameObjects.Image;
 
     private mainmenuMusic: Phaser.Sound.BaseSound;
+
+    private controls: Input;
 
 
     constructor() {
@@ -14,7 +17,7 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     init() {
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.controls = new Input(this);
     }
 
     preload() {
@@ -79,6 +82,11 @@ export default class MainMenuScene extends Phaser.Scene {
             this.mainmenuMusic.stop();
             this.scene.start('Stage1Scene');
         });
+
+        // wtf scene.scene
+        this.scene.scene.events.on('inputDown', () => this.selectNextButton(1));
+        this.scene.scene.events.on('inputUp', () => this.selectNextButton(-1));
+        this.scene.scene.events.on('inputJump', () => {console.log("jump!"); this.confirmSelection()});
     }
 
     selectButton(index: number) {
@@ -111,19 +119,5 @@ export default class MainMenuScene extends Phaser.Scene {
         const button = this.buttons[this.selectedButtonIndex];
 
         button.emit('selected');
-    }
-
-    update() {
-        const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up);
-        const downJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.down);
-        const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space);
-
-        if (upJustPressed) {
-            this.selectNextButton(-1);
-        } else if (downJustPressed) {
-            this.selectNextButton(1);
-        } else if (spaceJustPressed) {
-            this.confirmSelection();
-        }
     }
 }
