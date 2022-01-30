@@ -89,7 +89,7 @@ export default class Input extends Phaser.Events.EventEmitter {
             this.tapTimer = pointer.event.timeStamp;
         });
         this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-            if (pointer.event.timeStamp - this.tapTimer < 50) {
+            if (pointer.event.timeStamp - this.tapTimer < 70) {
                 this._emitJump();
             }
         });
