@@ -49,7 +49,7 @@ export default class MainMenuScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 32,
         });
-        this.load.spritesheet('wolf', 'assets/sprites/wolf.png', {
+        this.load.spritesheet('wolf', 'assets/sprites/wolf_sheet.png', {
             frameWidth: 40,
             frameHeight: 40,
         });
@@ -59,8 +59,13 @@ export default class MainMenuScene extends Phaser.Scene {
         });
         this.load.audio('analDrums', 'assets/sound/AnalogDrums.wav');
         this.load.audio('analBass', 'assets/sound/AnalogBass.wav');
+        this.load.audio('analPads', 'assets/sound/AnalogPads.wav');
+        this.load.audio('analLead', 'assets/sound/AnalogLead.wav');
+
         this.load.audio('digiDrums', 'assets/sound/drums.wav');
         this.load.audio('digiBass', 'assets/sound/bass.wav');
+        this.load.audio('digiPads', 'assets/sound/pads.wav');
+        this.load.audio('digiLead', 'assets/sound/lead.wav');
 
         this.load.audio('mainmenu_music', 'assets/sound/mainmenu.mp3');
 
@@ -73,14 +78,15 @@ export default class MainMenuScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
         const startButton = this.add.image(width * 0.5, height * 0.4, 'start');
-        const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
+        startButton.setInteractive();
+        // const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
 
         const _mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
         _mainmenuMusic.play({ volume: 0.5 });
         this.mainmenuMusic = _mainmenuMusic;
 
         this.buttons.push(startButton);
-        this.buttons.push(anotherButton);
+        // this.buttons.push(anotherButton);
 
         this.buttonSelector = this.add.image(0, 0, '');
 
@@ -93,7 +99,7 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.controls.on('inputDown', () => this.selectNextButton(1));
         this.controls.on('inputUp', () => this.selectNextButton(-1));
-        this.controls.on('inputJump', () => {console.log("jump!"); this.confirmSelection()});
+        this.controls.on('inputJump', () => {this.confirmSelection()});
     }
 
     selectButton(index: number) {

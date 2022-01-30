@@ -10,8 +10,6 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     readonly squirrelSpeedFast = 0.08;
     readonly wolfSpeed = 0.08;
     readonly wolfSpeedFast = 0.1;
-    7;
-    readonly walkingDistance = 30;
     readonly waitingTimeBetweenMove = 100;
 
     private originalX: number;
@@ -19,6 +17,8 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     private isDetectingPlayer = false;
     private direction: 'left' | 'right';
     private waitingDelta = 0;
+    private minX: number;
+    private maxX: number;
 
     enemyType: 'dark' | 'light' = 'light';
 
@@ -27,12 +27,15 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
         x: number,
         y: number,
         direction: 'left' | 'right',
-        player: Player
+        player: Player,
+        waypoints: { minX: number; maxX: number }
     ) {
         super(scene, x, y, 'squirrel');
         this.originalX = x;
         this.direction = direction;
         this.player = player;
+        this.minX = waypoints.minX;
+        this.maxX = waypoints.maxX;
 
         if (this.direction === 'right') {
             this.flipX = true;
@@ -76,7 +79,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
             repeat: -1,
         });
 
-        this.play('walk', true);
+        this.play(this.enemyType === 'light' ? 'walk' : 'wolf_walk', true);
     }
 
     update(time: number, dt: number) {
@@ -84,7 +87,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
             this.waiting = false;
         }
         if (!this.waiting) {
-            this.play('walk', true);
+            this.play(this.enemyType === 'light' ? 'walk' : 'wolf_walk', true);
 
             // Light world squirrels run away
             if (this.isDetectingPlayer && this.enemyType === 'light') {
@@ -120,7 +123,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
                         }
                     }
 
-                    if (!this.isDetectingPlayer && this.x < this.originalX - this.walkingDistance) {
+                    if (!this.isDetectingPlayer && this.x < this.minX) {
                         this.direction = 'right';
                         this.waiting = true;
                     }
@@ -142,14 +145,14 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
                         }
                     }
 
-                    if (!this.isDetectingPlayer && this.x > this.originalX + this.walkingDistance) {
+                    if (!this.isDetectingPlayer && this.x > this.maxX) {
                         this.direction = 'left';
                         this.waiting = true;
                     }
                     break;
             }
         } else {
-            this.play('walk', false);
+            this.play(this.enemyType === 'light' ? 'walk' : 'wolf_walk', false);
             if (this.waitingDelta > this.waitingTimeBetweenMove) {
                 this.waiting = false;
                 this.waitingDelta = 0;

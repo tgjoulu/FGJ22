@@ -1,3 +1,4 @@
+import Constants from './constants';
 
 interface Keys {
     left: Phaser.Input.Keyboard.Key,
@@ -10,13 +11,17 @@ export default class Input extends Phaser.Events.EventEmitter {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private keys: Keys;
     private gamepad: Phaser.Input.Gamepad.Gamepad;
+    private pointer: Phaser.Input.Pointer;
 
     private scene: Phaser.Scene;
+
+    private tapTimer: number;
 
     public constructor(scene: Phaser.Scene) {
         super()
         // super('input')
         this.scene = scene;
+        this.pointer = scene.input.activePointer;
         this.cursors = scene.input.keyboard.createCursorKeys();
         if (scene.input.gamepad.total) {
             this.gamepad = scene.input.gamepad.getPad(0);
@@ -36,6 +41,8 @@ export default class Input extends Phaser.Events.EventEmitter {
         }) as Keys;
 
         this._setupKeyboardEvents();
+
+        this._setupTouchControls();
     }
 
     _emitJump() {this.emit('inputJump');}
@@ -75,14 +82,34 @@ export default class Input extends Phaser.Events.EventEmitter {
         this.cursors.left.on('down', () => this._emitLeft() );
         this.cursors.right.on('down', () => this._emitRight() );
         this.cursors.space.on('down', () => this._emitJump() );
+    }
 
+    _setupTouchControls() {
+        this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+            this.tapTimer = pointer.event.timeStamp;
+        });
+        this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+            if (pointer.event.timeStamp - this.tapTimer < 70) {
+                this._emitJump();
+            }
+        });
     }
 
     isRightKeyDown(): boolean {
-        return (this.gamepad && this.gamepad.right) || this.keys.right.isDown || this.cursors.right.isDown;
+        return (
+            (this.gamepad && this.gamepad.right)
+            || this.keys.right.isDown
+            || this.cursors.right.isDown
+            || (this.pointer.isDown && this.pointer.x > Constants.DESIGN_WIDTH/2)
+        );
     }
 
     isLeftKeyDown(): boolean {
-        return (this.gamepad && this.gamepad.left) || this.keys.left.isDown || this.cursors.left.isDown;
+        return (
+            (this.gamepad && this.gamepad.left)
+            || this.keys.left.isDown
+            || this.cursors.left.isDown
+            || (this.pointer.isDown && this.pointer.x < Constants.DESIGN_WIDTH/2)
+        );
     }
 }

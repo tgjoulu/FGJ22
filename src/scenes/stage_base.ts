@@ -51,8 +51,10 @@ export default class StageSceneBase extends Phaser.Scene {
     waveGroup: Phaser.Physics.Arcade.Group;
     private waveTimer: Phaser.Time.Clock;
 
-    protected stageName: string = 'pieruperse';
+    public stageName: string = 'pieruperse';
     protected nextStageName: string;
+    private stageFinished: boolean;
+    private transitionTimer: Phaser.Time.TimerEvent;
 
     preload() {}
 
@@ -85,8 +87,12 @@ export default class StageSceneBase extends Phaser.Scene {
         //this._debugRenderTileCollisions(map);
         const bgAnalDrums = this.sound.add('analDrums', { loop: false });
         const bgAnalBass = this.sound.add('analBass', { loop: false });
+        const bgAnalPads = this.sound.add('analPads', { loop: false });
+        const bgAnalLead = this.sound.add('analLead', { loop: false });
         const bgDigiDrums = this.sound.add('digiDrums', { loop: false });
         const bgDigiBass = this.sound.add('digiBass', { loop: false });
+        const bgDigiPads = this.sound.add('digiPads', { loop: false });
+        const bgDigiLead = this.sound.add('digiLead', { loop: false });
 
         this.analDrumVol = 0.05;
         this.analBassVol = 1;
@@ -115,9 +121,9 @@ export default class StageSceneBase extends Phaser.Scene {
                 this.background.setTexture('background_dark');
             }
         });
-    }
 
-    sceneFinish() {}
+        this.scene.launch('UIScene', this);
+    }
 
     _stopSounds() {
         this.bgAnalogMusicLoops.map((s) => s.stop());
@@ -125,7 +131,7 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _restartScene() {
-        this._stopSounds;
+        this._stopSounds();
         this.scene.restart();
     }
 
@@ -144,7 +150,7 @@ export default class StageSceneBase extends Phaser.Scene {
         }
         const worldBounds = this.lightLayer.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -64);
+        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -32);
     }
 
     _addPlayer(spawn: Phaser.Math.Vector2) {
@@ -157,22 +163,23 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _addEnemies(tileMap: Phaser.Tilemaps.Tilemap) {
-        const collectables = tileMap.getObjectLayer('enemies');
-        if (!collectables) {
+        const enemies = tileMap.getObjectLayer('enemies');
+        if (!enemies) {
             // Not in every stage => ok
             return;
         }
 
-        collectables.objects.forEach((obj) => {
-            // TODO oravalle waypointit = obj.x -> obj.x + obj.width
+        enemies.objects.forEach((obj) => {
             const directions = ['left', 'right'] as ['left', 'right'];
             const direction = directions[Math.floor(Math.random() * 2)];
+
             const squirrel = new Squirrel(
                 this,
                 obj.x! + obj.width! / 2,
                 obj.y!,
                 direction,
-                this.player
+                this.player,
+                { minX: obj.x!, maxX: obj.x! + obj.width! }
             );
             this.squirrels.add(squirrel);
             this.enemyDetectZones.add(new LookupZone(this, 100, 200, squirrel, this.player));
@@ -233,6 +240,7 @@ export default class StageSceneBase extends Phaser.Scene {
             this.squirrels,
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
+                    this._stopSounds();
                     this.player._killPlayer();
                 }
             }
@@ -288,18 +296,22 @@ export default class StageSceneBase extends Phaser.Scene {
         });
         this.stage1Key.on('down', () => {
             console.log('debug: Stage1Scene');
+            this._stopSounds();
             this.scene.start('Stage1Scene');
         });
         this.stage2Key.on('down', () => {
             console.log('debug: Stage2Scene');
+            this._stopSounds();
             this.scene.start('Stage2Scene');
         });
         this.stage3Key.on('down', () => {
             console.log('debug: Stage3Scene');
+            this._stopSounds();
             this.scene.start('Stage3Scene');
         });
         this.stage4Key.on('down', () => {
             console.log('debug: Stage4Scene');
+            this._stopSounds();
             this.scene.start('Stage4Scene');
         });
     };
@@ -344,27 +356,34 @@ export default class StageSceneBase extends Phaser.Scene {
         this._checkPlayerBounds();
         this._checkEnemyBounds();
         this.waveGroup.preUpdate(time, dt);
-        if (this.collectableCount == 0) {
-            console.log(this.nextStageName);
+        if (this.collectableCount == 0 && !this.stageFinished) {
+            this.stageFinished = true;
             if (this.nextStageName) {
                 this._finishStage();
             } else {
+                // vaihda loppuruutusceneen
                 console.log('koko peli on läpi LOL');
             }
         }
     }
 
     _finishStage() {
-        // TODO näytä jotain paskaa
-        console.log('Finish stage, TODO transition juttu');
+        this.events.emit('onStageFinish');
+        this.transitionTimer = this.time.addEvent({
+            delay: 2000,
+            callback: this._startNextScene,
+            callbackScope: this,
+        });
+        this.player.body.moves = false;
         this._stopSounds();
+    }
+
+    _startNextScene() {
         this.scene.start(this.nextStageName);
     }
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            console.log('RESTART');
-            this._stopSounds();
             this._restartScene();
         }
     }
