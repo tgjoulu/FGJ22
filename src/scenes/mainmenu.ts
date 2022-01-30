@@ -69,14 +69,15 @@ export default class MainMenuScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
         const startButton = this.add.image(width * 0.5, height * 0.4, 'start');
-        const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
+        startButton.setInteractive();
+        // const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
 
         const _mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
         _mainmenuMusic.play({ volume: 0.5 });
         this.mainmenuMusic = _mainmenuMusic;
 
         this.buttons.push(startButton);
-        this.buttons.push(anotherButton);
+        // this.buttons.push(anotherButton);
 
         this.buttonSelector = this.add.image(0, 0, '');
 

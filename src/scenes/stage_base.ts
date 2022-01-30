@@ -233,6 +233,7 @@ export default class StageSceneBase extends Phaser.Scene {
             this.squirrels,
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
+                    this._stopSounds();
                     this.player._killPlayer();
                 }
             }
@@ -284,22 +285,27 @@ export default class StageSceneBase extends Phaser.Scene {
             this.events.emit('onWorldChange', activeWorldSide);
         });
         this.restartKey.on('down', () => {
+            this._stopSounds();
             this._restartScene();
         });
         this.stage1Key.on('down', () => {
             console.log('debug: Stage1Scene');
+            this._stopSounds();
             this.scene.start('Stage1Scene');
         });
         this.stage2Key.on('down', () => {
             console.log('debug: Stage2Scene');
+            this._stopSounds();
             this.scene.start('Stage2Scene');
         });
         this.stage3Key.on('down', () => {
             console.log('debug: Stage3Scene');
+            this._stopSounds();
             this.scene.start('Stage3Scene');
         });
         this.stage4Key.on('down', () => {
             console.log('debug: Stage4Scene');
+            this._stopSounds();
             this.scene.start('Stage4Scene');
         });
     };
