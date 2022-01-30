@@ -26,9 +26,12 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, 'wave');
         scene.add.existing(this);
 
-        this.setTexture('waveSprite');
-        this.displayHeight = height * 2;
+        this._initAnims();
 
+        this.setTexture('waveSprite');
+
+        this.displayHeight = height * 2;
+ 
         this.setOrigin(0.5, 0);
 
         scene.waveGroup.add(this, true);
@@ -41,6 +44,17 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         this.player = player;
         this.playerCollideCallback = overlapCallback;
         this.createPlayerCollider();
+    }
+
+    _initAnims() {
+        this.anims.create({
+            key: 'wave',
+            frameRate: 5,
+            frames: this.anims.generateFrameNumbers('wave', { start: 0, end: 2 }),
+            repeat: -1,
+        });
+
+        this.play('wave');
     }
 
     createPlayerCollider() {
