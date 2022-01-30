@@ -1,8 +1,9 @@
-import ArcadePhysicsCallback from 'phaser';
+import Constants from '../../constants';
 import Player from '../../player/player';
 
 export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     player: Player;
+    body: Phaser.Physics.Arcade.Body;
 
     // Constants
     readonly squirrelSpeed = 0.02;
@@ -41,18 +42,20 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
         // Physics
         scene.physics.add.existing(this);
-        this.setCollideWorldBounds(true);
-        (this.body as Phaser.Physics.Arcade.Body).onWorldBounds = true;
+        this.body = this.body as Phaser.Physics.Arcade.Body;
 
-        (this.body as Phaser.Physics.Arcade.Body).setBoundsRectangle(
-            new Phaser.Geom.Rectangle(0, 220, 1024, 400)
-        );
-        this.body.setSize(18, 28);
+        this.setCollideWorldBounds(true);
+        this.body.onWorldBounds = true;
+
+        this.body.setBoundsRectangle(new Phaser.Geom.Rectangle(0, 220, 1024, 400));
+        this.body.setSize(18, 28).setImmovable(true);
 
         // Stop velocity when hitting world bounds
         scene.physics.world.on('worldbounds', () => {
-            this.setVelocity(0);
-            this.stop();
+            if (this) {
+                this.setVelocity(0);
+                this.stop();
+            }
         });
 
         this._initAnims();
@@ -158,7 +161,15 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
     onWorldChange = (activeWorld: 0 | 1) => {
         //  Fixes bug where enemies go through floor
-        this.y = this.y - 6;
+        this.body.setAllowGravity(false);
+        this.body.setGravityY(-400);
+
+        setTimeout(() => {
+            if (this && this.body) {
+                this.body.setGravityY(Constants.GRAVITY_Y);
+            }
+        }, 500);
+
         switch (activeWorld) {
             case 0:
                 this.enemyType = 'light';

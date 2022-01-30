@@ -1,14 +1,12 @@
 import { Scene } from 'phaser';
 import StageSceneBase from '../scenes/stage_base';
+import Input from '../input';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
+    private controls: Input;
+
     // How long dead animation lasts
     readonly deadAnimationCount = 50;
-
-    private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    private moveRightKey: Phaser.Input.Keyboard.Key;
-    private moveLeftKey: Phaser.Input.Keyboard.Key;
-    private jumpKey: Phaser.Input.Keyboard.Key;
     private runSpeed: number = 220;
     private jumpForce: number = 200;
     private acceleration: number = 180;
@@ -33,17 +31,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     body: Phaser.Physics.Arcade.Body;
 
     public init(scene: Phaser.Scene) {
-        this.cursors = scene.input.keyboard.createCursorKeys();
-        this.moveRightKey = scene.input.keyboard.addKey('D');
-        this.moveLeftKey = scene.input.keyboard.addKey('A');
-        this.jumpKey = scene.input.keyboard.addKey('SPACE');
+        this.controls = new Input(scene);
+
         this.setBounce(0.01);
         this.setDragX(this.drag);
         this.setMaxVelocity(this.runSpeed, this.jumpForce);
         this._initAnims();
+        this._bindKeys();
 
         //this.setCollideWorldBounds(true, 0, 0);
-        this._bindKeys();
         this.body.setSize(18, 32);
         //   this.setOffset(14, 14);
     }
@@ -58,7 +54,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     _bindKeys() {
-        this.jumpKey.on('down', () => {
+        this.controls.on('inputJump', () => {
             if (this._canJump()) {
                 this.setVelocityY(-this.jumpForce);
                 this.stop();
@@ -74,7 +70,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.stop();
                 this.setFrame(2);
             }
-        });
+        })
     }
 
     update(time: number, dt: number) {
@@ -98,7 +94,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this._updateWallTouch(time);
         const grounded = this.body.blocked.down;
         this.setDragX(grounded ? this.drag : this.airDrag);
-        if (this.moveRightKey.isDown) {
+
+        if (this.controls.isRightKeyDown()) {
             this.setAccelerationX(grounded ? this.acceleration : this.airAcceleration);
             if (this.body.velocity.x < this.turnSpeed) {
                 this.setVelocityX(grounded ? this.turnSpeed : this.airTurnSpeed);
@@ -107,7 +104,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this._playWalkAnimation();
             }
             this.setFlipX(false);
-        } else if (this.moveLeftKey.isDown) {
+        } else if (this.controls.isLeftKeyDown()) {
             this.setAccelerationX(grounded ? -this.acceleration : -this.airAcceleration);
             if (this.body.velocity.x > -this.turnSpeed) {
                 this.setVelocityX(grounded ? -this.turnSpeed : -this.airTurnSpeed);

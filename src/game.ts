@@ -30,10 +30,13 @@ const config: Phaser.Types.Core.GameConfig = {
         arcade: {
             debug: true,
             tileBias: 4,
-            gravity: { y: 275 },
+            gravity: { y: Constants.GRAVITY_Y },
         },
     },
     title: 'TODO',
+    input: {
+      gamepad: true,
+    },
 };
 
 window.addEventListener('load', () => {
