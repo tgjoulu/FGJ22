@@ -19,6 +19,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private stage1Key: Phaser.Input.Keyboard.Key;
     private stage2Key: Phaser.Input.Keyboard.Key;
     private stage3Key: Phaser.Input.Keyboard.Key;
+    private stage4Key: Phaser.Input.Keyboard.Key;
     private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
@@ -139,7 +140,7 @@ export default class StageSceneBase extends Phaser.Scene {
         }
         const worldBounds = this.lightLayer.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -128);
+        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -64);
     }
 
     _addPlayer(spawn: Phaser.Math.Vector2) {
@@ -269,6 +270,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.stage1Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
         this.stage2Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
         this.stage3Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
+        this.stage4Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
@@ -291,6 +293,10 @@ export default class StageSceneBase extends Phaser.Scene {
         this.stage3Key.on('down', () => {
             console.log('debug: Stage3Scene');
             this.scene.start('Stage3Scene');
+        });
+        this.stage4Key.on('down', () => {
+            console.log('debug: Stage4Scene');
+            this.scene.start('Stage4Scene');
         });
     };
 

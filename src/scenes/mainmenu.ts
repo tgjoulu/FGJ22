@@ -32,6 +32,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('stage_1_map', `assets/tilemaps/stage_1.json`);
         this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
         this.load.tilemapTiledJSON('stage_3_map', `assets/tilemaps/stage_3.json`);
+        this.load.tilemapTiledJSON('stage_4_map', `assets/tilemaps/stage_4.json`);
         this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,

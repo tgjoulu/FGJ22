@@ -7,6 +7,7 @@ import UIScene from './scenes/uiscene';
 import Stage1Scene from './scenes/stage_1';
 import Stage2Scene from './scenes/stage_2';
 import Stage3Scene from './scenes/stage_3';
+import Stage4Scene from './scenes/stage_4';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -23,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
         height: Constants.DESIGN_HEIGHT,
         zoom: 2,
     },
-    scene: [MainMenuScene, Stage1Scene, Stage2Scene, Stage3Scene, UIScene],
+    scene: [MainMenuScene, Stage1Scene, Stage2Scene, Stage3Scene, Stage4Scene, UIScene],
     physics: {
         default: 'arcade',
         arcade: {
