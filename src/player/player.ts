@@ -1,6 +1,10 @@
 import { Scene } from 'phaser';
+import StageSceneBase from '../scenes/stage_base';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
+    // How long dead animation lasts
+    readonly deadAnimationCount = 50;
+
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private moveRightKey: Phaser.Input.Keyboard.Key;
     private moveLeftKey: Phaser.Input.Keyboard.Key;
@@ -23,6 +27,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private lastWallTouchRight: number = 0;
     private lastGroundTouch: number = 0;
     private curTime: number = 0;
+    private deadAnimationDelta = 0;
+    private isDying: boolean;
 
     body: Phaser.Physics.Arcade.Body;
 
@@ -70,6 +76,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(time: number, dt: number) {
+        if (this.isDying) {
+            this.setRotation(this.rotation + 0.04 * dt);
+            this.setVelocityY(-130);
+            this.deadAnimationDelta = this.deadAnimationDelta + 1;
+
+            if (this.deadAnimationDelta > this.deadAnimationCount) {
+                this.isDying = false;
+                (this.scene as StageSceneBase)._restartScene();
+            }
+        }
+
         this.curTime = time;
         if (this.curTurnDelayMS > 0) {
             this.curTurnDelayMS -= dt;
@@ -128,5 +145,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             (this.curTime - this.lastWallTouchLeft < this.wallJumpTriggerEaseMS ||
                 this.curTime - this.lastWallTouchRight < this.wallJumpTriggerEaseMS)
         );
+    }
+
+    _killPlayer() {
+        this.isDying = true;
+        this.deadAnimationDelta = 0;
     }
 }

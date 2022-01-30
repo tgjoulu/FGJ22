@@ -4,6 +4,7 @@ import Wave from '../objects/wave';
 import Collectable from '../objects/collectable';
 import Squirrel from '../objects/squirrel/squirrel';
 import Stage2Scene from './stage_2';
+import LookupZone from '../objects/squirrel/lookupzone';
 
 enum WorldSide {
     Light,
@@ -11,10 +12,8 @@ enum WorldSide {
 }
 
 export default class StageSceneBase extends Phaser.Scene {
-    private aboveLight: Phaser.Tilemaps.TilemapLayer;
-    private belowLight: Phaser.Tilemaps.TilemapLayer;
-    private aboveDark: Phaser.Tilemaps.TilemapLayer;
-    private belowDark: Phaser.Tilemaps.TilemapLayer;
+    private lightLayer: Phaser.Tilemaps.TilemapLayer;
+    private darkLayer: Phaser.Tilemaps.TilemapLayer;
     private player: Player;
     private worldSwapKey: Phaser.Input.Keyboard.Key;
     private stage1Key: Phaser.Input.Keyboard.Key;
@@ -23,10 +22,14 @@ export default class StageSceneBase extends Phaser.Scene {
     private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
+    private lightWorldEnemyCollider: Phaser.Physics.Arcade.Collider;
+    private darkWorldEnemyCollider: Phaser.Physics.Arcade.Collider;
     private enemiesCollider: Phaser.Physics.Arcade.Collider;
+    private enemyZoneCollider: Phaser.Physics.Arcade.Collider;
     private activeWorldSide: WorldSide;
     private collectableCount: number;
     private squirrels: Phaser.Physics.Arcade.Group;
+    private enemyDetectZones: Phaser.Physics.Arcade.StaticGroup;
 
     private digiDrums: Phaser.Sound.BaseSound;
     private digiBass: Phaser.Sound.BaseSound;
@@ -60,6 +63,12 @@ export default class StageSceneBase extends Phaser.Scene {
         const map = this.make.tilemap({ key: `${this.stageName}_map` });
         const tileSet = map.addTilesetImage('duality_tileset', 'duality_tileset');
         const spawnPoint = this._getSpawnPoint(map);
+
+        this.squirrels = this.physics.add.group({
+            collideWorldBounds: true,
+        });
+        this.enemyDetectZones = this.physics.add.staticGroup();
+
         this._addBackground();
         this._addPlayer(spawnPoint);
         this._addEnemies(map);
@@ -125,10 +134,10 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _initCamera() {
-        if (!this.belowLight) {
+        if (!this.lightLayer) {
             console.error('Initialize layers first lol');
         }
-        const worldBounds = this.belowLight.getBounds();
+        const worldBounds = this.lightLayer.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
         this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -128);
     }
@@ -148,17 +157,26 @@ export default class StageSceneBase extends Phaser.Scene {
             // Not in every stage => ok
             return;
         }
-        this.squirrels = this.physics.add.group({
-            collideWorldBounds: true,
-        });
 
         collectables.objects.forEach((obj) => {
             // TODO oravalle waypointit = obj.x -> obj.x + obj.width
-            console.log;
-            this.squirrels.add(new Squirrel(this, obj.x! + obj.width! / 2, obj.y!, 'left'));
+            const directions = ['left', 'right'] as ['left', 'right'];
+            const direction = directions[Math.floor(Math.random() * 2)];
+            const squirrel = new Squirrel(
+                this,
+                obj.x! + obj.width! / 2,
+                obj.y!,
+                direction,
+                this.player
+            );
+            this.squirrels.add(squirrel);
+            this.enemyDetectZones.add(new LookupZone(this, 100, 200, squirrel, this.player));
         });
 
+        // Add vihulaiset
+
         this.add.existing(this.squirrels);
+        this.add.existing(this.enemyDetectZones);
     }
 
     _getSpawnPoint(tileMap: Phaser.Tilemaps.Tilemap): Phaser.Math.Vector2 {
@@ -185,27 +203,36 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
-        this.aboveLight = tileMap.createLayer('above_light', tileSet, 0, 0);
-        this.belowLight = tileMap.createLayer('below_light', tileSet, 0, 0);
-        this.aboveDark = tileMap.createLayer('above_dark', tileSet, 0, 0);
-        this.belowDark = tileMap.createLayer('below_dark', tileSet, 0, 0);
-        const mapBounds = this.belowLight.getBounds();
+        this.lightLayer = tileMap.createLayer('light', tileSet, 0, 0);
+        this.darkLayer = tileMap.createLayer('dark', tileSet, 0, 0);
+        const mapBounds = this.lightLayer.getBounds();
         this.physics.world.setBounds(0, 0, mapBounds.width, mapBounds.height);
     }
 
     _initWorldColliders() {
-        this.belowLight.setCollisionByProperty({ collides: true });
-        this.belowDark.setCollisionByProperty({ collides: true });
+        this.lightLayer.setCollisionByProperty({ collides: true });
+        this.darkLayer.setCollisionByProperty({ collides: true });
 
-        this.lightWorldCollider = this.physics.add.collider(this.player, this.belowLight);
-        this.darkWorldCollider = this.physics.add.collider(this.player, this.belowDark);
+        this.lightWorldCollider = this.physics.add.collider(this.player, this.lightLayer);
+        this.darkWorldCollider = this.physics.add.collider(this.player, this.darkLayer);
+        this.lightWorldEnemyCollider = this.physics.add.collider(this.squirrels, this.lightLayer);
+        this.darkWorldEnemyCollider = this.physics.add.collider(this.squirrels, this.darkLayer);
 
         this.lightWorldCollider.active = false;
         this.darkWorldCollider.active = false;
+        this.lightWorldEnemyCollider.active = false;
+        this.darkWorldEnemyCollider.active = false;
 
-        this.enemiesCollider = this.physics.add.collider(this.squirrels, this.player);
-        this.physics.add.collider(this.belowDark, this.squirrels);
-        this.physics.add.collider(this.belowLight, this.squirrels);
+        this.enemiesCollider = this.physics.add.collider(
+            this.player,
+            this.squirrels,
+            (player, squirrel) => {
+                if ((squirrel as Squirrel).enemyType === 'dark') {
+                    this.player._killPlayer();
+                }
+            }
+        );
+
         this.enemiesCollider.active = false;
     }
 
@@ -228,12 +255,14 @@ export default class StageSceneBase extends Phaser.Scene {
         const lightSide = !darkSide;
 
         this.darkWorldCollider.active = darkSide;
-        this.belowDark.visible = darkSide;
-        this.aboveDark.visible = darkSide;
+        this.darkWorldEnemyCollider.active = darkSide;
+        this.darkLayer.visible = darkSide;
 
         this.lightWorldCollider.active = lightSide;
-        this.belowLight.visible = lightSide;
-        this.aboveLight.visible = lightSide;
+        this.lightWorldEnemyCollider.active = lightSide;
+        this.lightLayer.visible = lightSide;
+
+        this.enemiesCollider.active = worldSide === WorldSide.Dark;
     }
 
     _enableDebugKeys = () => {
@@ -289,12 +318,21 @@ export default class StageSceneBase extends Phaser.Scene {
 
     update(time: number, dt: number) {
         this.player.update(time, dt);
+
         if (this.squirrels) {
             this.squirrels.getChildren().forEach((squirrel) => {
                 squirrel.update(time, dt);
             });
         }
+
+        if (this.enemyDetectZones) {
+            this.enemyDetectZones.getChildren().forEach((zone) => {
+                zone.update(time, dt);
+            });
+        }
+
         this._checkPlayerBounds();
+        this._checkEnemyBounds();
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0) {
             console.log(this.nextStageName);
@@ -316,6 +354,17 @@ export default class StageSceneBase extends Phaser.Scene {
         if (this.player.y > this.physics.world.bounds.bottom) {
             console.log('RESTART');
             this._restartScene();
+        }
+    }
+    _checkEnemyBounds() {
+        if (this.squirrels) {
+            this.squirrels.getChildren().forEach((child) => {
+                const squirrel = child as Squirrel;
+                if (squirrel.y > this.physics.world.bounds.bottom - 20) {
+                    this.squirrels.remove(squirrel);
+                    squirrel.destroy();
+                }
+            });
         }
     }
 
