@@ -36,6 +36,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private deathSound: Phaser.Sound.BaseSound;
     private teleportSound: Phaser.Sound.BaseSound;
     private crystalSound: Phaser.Sound.BaseSound;
+    private waveSound: Phaser.Sound.BaseSound;
 
     private bgAnalogMusicLoops: Phaser.Sound.BaseSound[];
     private bgDigitalMusicLoops: Phaser.Sound.BaseSound[];
@@ -98,6 +99,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.crystalSound = this.sound.add('crystal');
         this.deathSound = this.sound.add('death1');
         this.teleportSound = this.sound.add('teleport');
+        this.waveSound = this.sound.add('wave');
 
 
         this.analDrumVol = 0.05;
@@ -247,7 +249,7 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
-                    this.deathSound.play();
+                    this.deathSound.play( {volume: 0.7});
                     this.player._killPlayer();
                 }
             }
@@ -390,7 +392,7 @@ export default class StageSceneBase extends Phaser.Scene {
             callbackScope: this,
         });
         this.player.body.moves = false;
-        this.teleportSound.play();
+        this.teleportSound.play( {volume: 0.7});
         this._stopSounds();
     }
 
@@ -400,7 +402,7 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            this.deathSound.play();
+            this.deathSound.play( {volume: 0.5});
             this._restartScene();
         }
     }
@@ -417,6 +419,7 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _onPlayerWaveCollide = () => {
+        this.waveSound.play({volume: 0.5});
         if (this.activeWorldSide == WorldSide.Light) {
             this._enableWorld(WorldSide.Dark);
             this.events.emit('onWorldChange', WorldSide.Dark);
@@ -429,6 +432,7 @@ export default class StageSceneBase extends Phaser.Scene {
     };
 
     _onCollectableCollide = () => {
+        this.crystalSound.play( {volume: 0.5});
         this.collectableCount--;
         console.log(this.collectableCount);
     };
