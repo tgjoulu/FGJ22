@@ -20,7 +20,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private drag: number = 600;
     private airDrag: number = 1500;
     private wallJumpForceY: number = 150;
-    private wallJumpForceX: number = 180;
+    private wallJumpForceX: number = 190;
     private wallJumpTriggerEaseMS = 150; // Should be less than turnDelayMS
     private groundTouchTriggerEaseMS = 100;
     private lastWallTouchLeft: number = 0;
@@ -51,8 +51,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     _initAnims() {
         this.anims.create({
             key: 'walk',
-            frameRate: 8,
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+            frameRate: 10,
+            frames: this.anims.generateFrameNumbers('player', { start: 1, end: 4 }),
             repeat: -1,
         });
     }
@@ -62,7 +62,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (this._canJump()) {
                 this.setVelocityY(-this.jumpForce);
                 this.stop();
-                this.setFrame(0);
+                this.setFrame(2);
             } else if (this._canWallJump()) {
                 this.setVelocityY(-this.wallJumpForceY);
                 const wallJumpLeft = this.lastWallTouchLeft > this.lastWallTouchRight;
@@ -70,7 +70,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setAccelerationX(this.airAcceleration * (wallJumpLeft ? 1 : -1));
                 this.curTurnDelayMS = this.turnDelayMS;
                 this.setDragX(this.drag);
-                this.setFlipX(this.body.blocked.right);
+                this.setFlipX(!wallJumpLeft);
+                this.stop();
+                this.setFrame(2);
             }
         });
     }
@@ -102,7 +104,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setVelocityX(grounded ? this.turnSpeed : this.airTurnSpeed);
             }
             if (grounded) {
-                this.play('walk', true);
+                this._playWalkAnimation();
             }
             this.setFlipX(false);
         } else if (this.moveLeftKey.isDown) {
@@ -112,12 +114,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             }
             this.setFlipX(true);
             if (grounded) {
-                this.play('walk', true);
+                this._playWalkAnimation();
             }
         } else {
             this.setAccelerationX(0);
-            this.stop();
+            if (Math.abs(this.body.velocity.x) < 5) {
+                this.setFrame(0);
+                this.stop();
+            }
         }
+    }
+
+    _playWalkAnimation() {
+        if (this.anims.isPlaying && this.anims.currentAnim.key === 'walk') {
+            return;
+        }
+        this.play('walk', true);
     }
 
     _canJump(): boolean {
