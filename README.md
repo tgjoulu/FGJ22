@@ -26,4 +26,5 @@ npm run build
 Release branch is automatically deployed to [https://tgjoulu.github.io/FGJ22/](https://tgjoulu.github.io/FGJ22/)
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+Creative Commons
+
