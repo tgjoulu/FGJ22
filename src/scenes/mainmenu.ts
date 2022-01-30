@@ -100,7 +100,6 @@ export default class MainMenuScene extends Phaser.Scene {
         const startButton = this.add.image(width * 0.5, height * 0.7, 'start');
         startButton.setScale(0.5)
         startButton.setInteractive();
-        // const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
 
         const _mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
         _mainmenuMusic.play({ volume: 0.5 });
@@ -118,9 +117,7 @@ export default class MainMenuScene extends Phaser.Scene {
             this.scene.start('Stage1Scene');
         });
 
-        this.controls.on('inputDown', () => this.selectNextButton(1));
-        this.controls.on('inputUp', () => this.selectNextButton(-1));
-        this.controls.on('inputJump', () => {this.confirmSelection()});
+        this.controls.on('inputAnyKey', () => {this.confirmSelection()});
 
         const crystalAnimation = this.anims.create({
             key: 'run',
