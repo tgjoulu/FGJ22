@@ -119,9 +119,13 @@ export default class StageSceneBase extends Phaser.Scene {
 
     sceneFinish() {}
 
-    _restartScene() {
+    _stopSounds() {
         this.bgAnalogMusicLoops.map((s) => s.stop());
         this.bgDigitalMusicLoops.map((s) => s.stop());
+    }
+
+    _restartScene() {
+        this._stopSounds;
         this.scene.restart();
     }
 
@@ -353,12 +357,14 @@ export default class StageSceneBase extends Phaser.Scene {
     _finishStage() {
         // TODO näytä jotain paskaa
         console.log('Finish stage, TODO transition juttu');
+        this._stopSounds();
         this.scene.start(this.nextStageName);
     }
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
             console.log('RESTART');
+            this._stopSounds();
             this._restartScene();
         }
     }
