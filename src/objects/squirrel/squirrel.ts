@@ -69,6 +69,13 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
             repeat: -1,
         });
 
+        this.anims.create({
+            key: 'wolf_walk',
+            frameRate: 4,
+            frames: this.anims.generateFrameNumbers('wolf', { start: 0, end: 1 }),
+            repeat: -1,
+        });
+
         this.play('walk', true);
     }
 
