@@ -49,13 +49,6 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
         this.body.setBoundsRectangle(new Phaser.Geom.Rectangle(0, 220, 1024, 400));
         this.body.setImmovable(true);
-        // Stop velocity when hitting world bounds
-        scene.physics.world.on('worldbounds', () => {
-            if (this) {
-                this.setVelocity(0);
-                this.stop();
-            }
-        });
 
         this._initAnims();
     }
@@ -171,6 +164,10 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
     onLostPlayer = () => {
         this.isDetectingPlayer = false;
+    };
+
+    onLevelEnd = () => {
+        this.waiting = true;
     };
 
     onWorldChange = (activeWorld: 0 | 1) => {

@@ -104,7 +104,6 @@ export default class StageSceneBase extends Phaser.Scene {
         this.waveSound = this.sound.add('wave');
         this.wolfSound = this.sound.add('wolf');
 
-
         this.collectableVol = 0.1;
 
         this.analDrumVol = 0.1;
