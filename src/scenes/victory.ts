@@ -22,6 +22,7 @@ export default class VictoryScene extends Phaser.Scene {
         this.background.setTilePosition(this.cameras.main.scrollX);
         const bgSound = this.sound.add('outro_music', { loop: false });
         bgSound.play( {volume: 0.5} );
+
         this.controls.on('inputAnyKey', () => {
             // window.location.reload();
             this.scene.start('MainMenuScene');
