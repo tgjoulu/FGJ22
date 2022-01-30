@@ -134,7 +134,7 @@ export default class MainMenuScene extends Phaser.Scene {
 
     _startTheGame() {
         this.mainmenuMusic.stop();
-        this.scene.start('Stage1Scene');
+        this.scene.start('Instructions');
     }
 
     selectButton(index: number) {

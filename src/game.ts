@@ -10,6 +10,7 @@ import Stage3Scene from './scenes/stage_3';
 import Stage4Scene from './scenes/stage_4';
 import Stage5Scene from './scenes/stage_5';
 import VictoryScene from './scenes/victory';
+import InstructionsScene from './scenes/instructions';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -39,6 +40,7 @@ const config: Phaser.Types.Core.GameConfig = {
         Stage5Scene,
         UIScene,
         VictoryScene,
+        InstructionsScene,
     ],
     physics: {
         default: 'arcade',
