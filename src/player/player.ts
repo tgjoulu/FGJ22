@@ -9,7 +9,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // How long dead animation lasts
     readonly deadAnimationCount = 50;
     private runSpeed: number = 220;
-    private jumpForce: number = 200;
+    private jumpForce: number = 203;
     private acceleration: number = 180;
     private airAcceleration: number = 100;
     private turnSpeed: number = 100;
@@ -58,11 +58,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     _bindKeys() {
         this.controls.on('inputJump', () => {
             if (this._canJump()) {
+                this.setDragY(0);
                 this.setVelocityY(-this.jumpForce);
                 this.stop();
                 this.setFrame(2);
-                this.setDragY(0);
             } else if (this._canWallJump()) {
+                this.setDragY(0);
                 this.setVelocityY(-this.wallJumpForceY);
                 const wallJumpLeft = this.lastWallTouchLeft > this.lastWallTouchRight;
                 this.setVelocityX(this.wallJumpForceX * (wallJumpLeft ? 1 : -1));
@@ -72,7 +73,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setFlipX(!wallJumpLeft);
                 this.stop();
                 this.setFrame(2);
-                this.setDragY(0);
             }
         });
     }
