@@ -23,11 +23,13 @@ export default class UIScene extends Phaser.Scene {
     }
 
     create() {
+        this.levelFinished = false;
         this.timerbg = this.add.image(
-            this.cameras.main.width * 0.060,
+            this.cameras.main.width * 0.06,
             this.cameras.main.height * 0.08,
-            'timerbg');
-        
+            'timerbg'
+        );
+
         this.timeText = this.add.text(
             this.cameras.main.width * 0.03,
             this.cameras.main.height * 0.03,
@@ -48,7 +50,6 @@ export default class UIScene extends Phaser.Scene {
         );
         this.setHighScore();
 
-
         this.currentScene.events.on('onStageFinish', this.stopEvent, this);
 
         this.timedEvent = this.time.addEvent({
@@ -57,20 +58,22 @@ export default class UIScene extends Phaser.Scene {
     }
 
     setHighScore() {
-        let highscores = JSON.parse(localStorage.getItem('highscores') || '{}') as {[key: string]: string[]};
+        let highscores = JSON.parse(localStorage.getItem('highscores') || '{}') as {
+            [key: string]: string[];
+        };
 
-        console.log(highscores);
-        
         let best = 0.0;
-        let scores = highscores[this.currentScene.stageName].map((x: string) => (Number.parseFloat(x)));
+        let scores = highscores[this.currentScene.stageName].map((x: string) =>
+            Number.parseFloat(x)
+        );
 
         best = Math.min(...scores);
 
-        console.log(scores);
+        if (best === Infinity) {
+            best = 0.0;
+        }
 
-        console.log(best);
-
-        this.highText.setText("Best: " + best.toString());
+        this.highText.setText('Best: ' + best.toString());
     }
 
     stopEvent() {
@@ -78,6 +81,7 @@ export default class UIScene extends Phaser.Scene {
 
         if (!this.levelFinished) {
             this.saveHighscore(this.timeText.text);
+            this.setHighScore();
         }
 
         this.tweens.add({
