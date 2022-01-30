@@ -1,12 +1,4 @@
 { "compressionlevel":0,
- "editorsettings":
-    {
-     "export":
-        {
-         "format":"json",
-         "target":"stage_5"
-        }
-    },
  "height":30,
  "infinite":false,
  "layers":[
