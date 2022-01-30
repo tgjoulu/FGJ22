@@ -5,10 +5,11 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     player: Player;
 
     // Constants
-    readonly bunnySpeed = 0.2;
-    readonly bunnySpeedFast = 0.5;
-    readonly wolfSpeed = 0.5;
-    readonly wolfSpeedFast = 0.7;
+    readonly squirrelSpeed = 0.02;
+    readonly squirrelSpeedFast = 0.08;
+    readonly wolfSpeed = 0.08;
+    readonly wolfSpeedFast = 0.1;
+    7;
     readonly walkingDistance = 30;
     readonly waitingTimeBetweenMove = 100;
 
@@ -97,15 +98,15 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
                     if (this.enemyType === 'light') {
                         if (this.isDetectingPlayer) {
-                            this.x = this.x - this.bunnySpeedFast;
+                            this.x = this.x - this.squirrelSpeedFast * dt;
                         } else {
-                            this.x = this.x - this.bunnySpeed;
+                            this.x = this.x - this.squirrelSpeed * dt;
                         }
                     } else if (this.enemyType === 'dark') {
                         if (this.isDetectingPlayer) {
-                            this.x = this.x - this.wolfSpeedFast;
+                            this.x = this.x - this.wolfSpeedFast * dt;
                         } else {
-                            this.x = this.x - this.wolfSpeed;
+                            this.x = this.x - this.wolfSpeed * dt;
                         }
                     }
 
@@ -119,15 +120,15 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
                     if (this.enemyType === 'light') {
                         if (this.isDetectingPlayer) {
-                            this.x = this.x + this.bunnySpeedFast;
+                            this.x = this.x + this.squirrelSpeedFast * dt;
                         } else {
-                            this.x = this.x + this.bunnySpeed;
+                            this.x = this.x + this.squirrelSpeed * dt;
                         }
                     } else if (this.enemyType === 'dark') {
                         if (this.isDetectingPlayer) {
-                            this.x = this.x + this.wolfSpeedFast;
+                            this.x = this.x + this.wolfSpeedFast * dt;
                         } else {
-                            this.x = this.x + this.wolfSpeed;
+                            this.x = this.x + this.wolfSpeed * dt;
                         }
                     }
 
