@@ -83,7 +83,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this._initLevel(map, tileSet);
         this._initWorldColliders();
         this._enableWorld(WorldSide.Light);
-        this._enableDebugKeys();
+        //this._enableDebugKeys();
         this._initCamera();
         this._initWaves();
         this._createCollectables(map);
@@ -187,14 +187,11 @@ export default class StageSceneBase extends Phaser.Scene {
         }
 
         enemies.objects.forEach((obj) => {
-            const directions = ['left', 'right'] as ['left', 'right'];
-            const direction = directions[Math.floor(Math.random() * 2)];
-
             const squirrel = new Squirrel(
                 this,
                 obj.x! + obj.width! / 2,
                 obj.y!,
-                direction,
+                'right',
                 this.player,
                 { minX: obj.x!, maxX: obj.x! + obj.width! }
             );
