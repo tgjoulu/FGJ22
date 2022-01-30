@@ -90,7 +90,7 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.controls.on('inputDown', () => this.selectNextButton(1));
         this.controls.on('inputUp', () => this.selectNextButton(-1));
-        this.controls.on('inputJump', () => {console.log("jump!"); this.confirmSelection()});
+        this.controls.on('inputJump', () => {this.confirmSelection()});
     }
 
     selectButton(index: number) {
