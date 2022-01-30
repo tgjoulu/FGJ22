@@ -164,15 +164,16 @@ export default class StageSceneBase extends Phaser.Scene {
         }
 
         collectables.objects.forEach((obj) => {
-            // TODO oravalle waypointit = obj.x -> obj.x + obj.width
             const directions = ['left', 'right'] as ['left', 'right'];
             const direction = directions[Math.floor(Math.random() * 2)];
+
             const squirrel = new Squirrel(
                 this,
                 obj.x! + obj.width! / 2,
                 obj.y!,
                 direction,
-                this.player
+                this.player,
+                { minX: obj.x!, maxX: obj.x! + obj.width! }
             );
             this.squirrels.add(squirrel);
             this.enemyDetectZones.add(new LookupZone(this, 100, 200, squirrel, this.player));
