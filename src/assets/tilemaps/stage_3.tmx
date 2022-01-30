@@ -147,16 +147,16 @@
   </tile>
  </tileset>
  <objectgroup id="8" name="collectables" offsetx="14.1459" offsety="155.018">
-  <object id="4" name="col" x="626" y="245">
+  <object id="4" name="col" x="626" y="244">
    <point/>
   </object>
   <object id="5" name="col" x="433.021" y="182.982">
    <point/>
   </object>
-  <object id="9" name="col" x="219.521" y="245">
+  <object id="9" name="col" x="219.521" y="244">
    <point/>
   </object>
-  <object id="10" name="col" x="792.521" y="250.649">
+  <object id="10" name="col" x="792.521" y="243.649">
    <point/>
   </object>
  </objectgroup>

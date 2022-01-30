@@ -82,7 +82,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this._initLevel(map, tileSet);
         this._initWorldColliders();
         this._enableWorld(WorldSide.Light);
-        this._enableDebugKeys();
+        //this._enableDebugKeys();
         this._initCamera();
         this._initWaves();
         this._createCollectables(map);
@@ -119,10 +119,10 @@ export default class StageSceneBase extends Phaser.Scene {
 
         bgAnalDrums.play({ volume: this.analDrumVol });
         bgAnalBass.play({ volume: this.analBassVol });
-        if(['stage_3', 'stage_4', 'stage_5'].indexOf(this.stageName) > -1)
-            bgAnalPads.play( { volume: this.digiBassVol });
-        if(['stage_4', 'stage_5'].indexOf(this.stageName) > -1)   
-            bgAnalLead.play( { volume: this.digiBassVol });
+        if (['stage_3', 'stage_4', 'stage_5'].indexOf(this.stageName) > -1)
+            bgAnalPads.play({ volume: this.digiBassVol });
+        if (['stage_4', 'stage_5'].indexOf(this.stageName) > -1)
+            bgAnalLead.play({ volume: this.digiBassVol });
 
         this.events.on('onWorldChange', (activeWorld: 0 | 1) => {
             if (this.squirrels) {
@@ -186,14 +186,11 @@ export default class StageSceneBase extends Phaser.Scene {
         }
 
         enemies.objects.forEach((obj) => {
-            const directions = ['left', 'right'] as ['left', 'right'];
-            const direction = directions[Math.floor(Math.random() * 2)];
-
             const squirrel = new Squirrel(
                 this,
                 obj.x! + obj.width! / 2,
                 obj.y!,
-                direction,
+                'right',
                 this.player,
                 { minX: obj.x!, maxX: obj.x! + obj.width! }
             );
@@ -257,8 +254,8 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
-                    this.wolfSound.play( {volume: 0.7});
-                    this.deathSound.play( {volume: 0.7});
+                    this.wolfSound.play({ volume: 0.7 });
+                    this.deathSound.play({ volume: 0.7 });
                     this.player._killPlayer();
                 }
             }
@@ -401,7 +398,7 @@ export default class StageSceneBase extends Phaser.Scene {
             callbackScope: this,
         });
         this.player.body.moves = false;
-        this.teleportSound.play( {volume: 0.7});
+        this.teleportSound.play({ volume: 0.7 });
         this._stopSounds();
     }
 
@@ -411,7 +408,7 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            this.deathSound.play( {volume: 0.4});
+            this.deathSound.play({ volume: 0.4 });
             this._restartScene();
         }
     }
@@ -428,7 +425,7 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _onPlayerWaveCollide = () => {
-        this.waveSound.play({volume: 0.5});
+        this.waveSound.play({ volume: 0.5 });
         if (this.activeWorldSide == WorldSide.Light) {
             this._enableWorld(WorldSide.Dark);
             this.events.emit('onWorldChange', WorldSide.Dark);
@@ -441,7 +438,7 @@ export default class StageSceneBase extends Phaser.Scene {
     };
 
     _onCollectableCollide = () => {
-        this.crystalSound.play( {volume: this.collectableVol});
+        this.crystalSound.play({ volume: this.collectableVol });
         this.collectableCount--;
         console.log(this.collectableCount);
     };

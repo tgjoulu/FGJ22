@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="20">
  <editorsettings>
-  <export target="stage_5.json" format="json"/>
+  <export target="stage_4.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="duality_tileset" tilewidth="32" tileheight="32" tilecount="220" columns="20">
   <image source="../sprites/duality_tileset.png" width="640" height="360"/>
@@ -194,16 +194,16 @@
   </tile>
  </tileset>
  <objectgroup id="8" name="collectables" offsetx="46.8126" offsety="145.018">
-  <object id="6" name="gem" x="477.409" y="62.7133">
+  <object id="6" name="gem" x="477.409" y="60.7133">
    <point/>
   </object>
-  <object id="7" name="gem" x="17.0207" y="59.6487">
+  <object id="7" name="gem" x="17.0207" y="57.6487">
    <point/>
   </object>
   <object id="16" name="gem" x="272.187" y="283.982">
    <point/>
   </object>
-  <object id="19" name="gem" x="477.187" y="-33.018">
+  <object id="19" name="gem" x="477.187" y="-35.018">
    <point/>
   </object>
  </objectgroup>
