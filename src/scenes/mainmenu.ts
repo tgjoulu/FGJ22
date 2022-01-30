@@ -12,11 +12,7 @@ export default class MainMenuScene extends Phaser.Scene {
     private controls: Input;
 
     constructor() {
-        super('main-menu');
-    }
-
-    init() {
-        this.controls = new Input(this);
+        super({ key: 'MainMenuScene' });
     }
 
     preload() {
@@ -88,17 +84,17 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.image('background_dark', 'assets/sprites/background_dark.png');
 
         this.load.image('start_menu', 'assets/sprites/start_menu.png');
-
     }
 
     create() {
+        console.log('mainmenu created');
+        this.controls = new Input(this);
         const { width, height } = this.scale;
-
 
         this.add.image(width * 0.5, height * 0.5, 'start_menu');
 
         const startButton = this.add.image(width * 0.5, height * 0.7, 'start');
-        startButton.setScale(0.5)
+        startButton.setScale(0.5);
         startButton.setInteractive();
 
         const _mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
@@ -117,7 +113,9 @@ export default class MainMenuScene extends Phaser.Scene {
             this.scene.start('Stage1Scene');
         });
 
-        this.controls.on('inputAnyKey', () => {this.confirmSelection()});
+        this.controls.on('inputAnyKey', () => {
+            this.confirmSelection();
+        });
 
         const crystalAnimation = this.anims.create({
             key: 'run',
@@ -128,9 +126,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
         const crystal = this.add.sprite(64, 64, 'collectable_big');
         crystal.setScale(4);
-        crystal.setPosition(width * 0.5, height * 0.3)
+        crystal.setPosition(width * 0.5, height * 0.3);
         crystal.play('run');
-
     }
 
     selectButton(index: number) {

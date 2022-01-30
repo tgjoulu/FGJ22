@@ -103,7 +103,6 @@ export default class StageSceneBase extends Phaser.Scene {
         this.waveSound = this.sound.add('wave');
         this.wolfSound = this.sound.add('wolf');
 
-
         this.analDrumVol = 0.05;
         this.analBassVol = 1;
         this.digiDrumVol = 0.05;
@@ -117,10 +116,10 @@ export default class StageSceneBase extends Phaser.Scene {
 
         bgAnalDrums.play({ volume: this.analDrumVol });
         bgAnalBass.play({ volume: this.analBassVol });
-        if(['stage_3', 'stage_4', 'stage_5'].indexOf(this.stageName) > -1)
-            bgAnalPads.play( { volume: this.digiBassVol });
-        if(['stage_4', 'stage_5'].indexOf(this.stageName) > -1)   
-            bgAnalLead.play( { volume: this.digiBassVol });
+        if (['stage_3', 'stage_4', 'stage_5'].indexOf(this.stageName) > -1)
+            bgAnalPads.play({ volume: this.digiBassVol });
+        if (['stage_4', 'stage_5'].indexOf(this.stageName) > -1)
+            bgAnalLead.play({ volume: this.digiBassVol });
 
         this.events.on('onWorldChange', (activeWorld: 0 | 1) => {
             if (this.squirrels) {
@@ -255,8 +254,8 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
-                    this.wolfSound.play( {volume: 0.7});
-                    this.deathSound.play( {volume: 0.7});
+                    this.wolfSound.play({ volume: 0.7 });
+                    this.deathSound.play({ volume: 0.7 });
                     this.player._killPlayer();
                 }
             }
@@ -382,12 +381,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0 && !this.stageFinished) {
             this.stageFinished = true;
-            if (this.nextStageName) {
-                this._finishStage();
-            } else {
-                // vaihda loppuruutusceneen
-                console.log('koko peli on läpi LOL');
-            }
+            this._finishStage();
         }
     }
 
@@ -399,17 +393,22 @@ export default class StageSceneBase extends Phaser.Scene {
             callbackScope: this,
         });
         this.player.body.moves = false;
-        this.teleportSound.play( {volume: 0.7});
+        this.teleportSound.play({ volume: 0.7 });
         this._stopSounds();
     }
 
     _startNextScene() {
-        this.scene.start(this.nextStageName);
+        if (this.nextStageName) {
+            this.scene.start(this.nextStageName);
+        } else {
+            this.scene.remove('UIScene');
+            this.scene.start('VictoryScene');
+        }
     }
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            this.deathSound.play( {volume: 0.5});
+            this.deathSound.play({ volume: 0.5 });
             this._restartScene();
         }
     }
@@ -426,7 +425,7 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _onPlayerWaveCollide = () => {
-        this.waveSound.play({volume: 0.5});
+        this.waveSound.play({ volume: 0.5 });
         if (this.activeWorldSide == WorldSide.Light) {
             this._enableWorld(WorldSide.Dark);
             this.events.emit('onWorldChange', WorldSide.Dark);
@@ -439,7 +438,7 @@ export default class StageSceneBase extends Phaser.Scene {
     };
 
     _onCollectableCollide = () => {
-        this.crystalSound.play( {volume: 0.5});
+        this.crystalSound.play({ volume: 0.5 });
         this.collectableCount--;
         console.log(this.collectableCount);
     };
