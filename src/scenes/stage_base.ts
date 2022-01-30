@@ -42,6 +42,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private bgAnalogMusicLoops: Phaser.Sound.BaseSound[];
     private bgDigitalMusicLoops: Phaser.Sound.BaseSound[];
 
+    private collectableVol: integer;
     private analDrumVol: integer;
     private analBassVol: integer;
     private digiDrumVol: integer;
@@ -103,10 +104,11 @@ export default class StageSceneBase extends Phaser.Scene {
         this.waveSound = this.sound.add('wave');
         this.wolfSound = this.sound.add('wolf');
 
+        this.collectableVol = 0.1;
 
-        this.analDrumVol = 0.05;
+        this.analDrumVol = 0.1;
         this.analBassVol = 1;
-        this.digiDrumVol = 0.05;
+        this.digiDrumVol = 0.1;
         this.digiBassVol = 0.2;
 
         this.bgAnalogMusicLoops = [bgAnalDrums, bgAnalBass, bgAnalPads, bgAnalLead];
@@ -409,7 +411,7 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            this.deathSound.play( {volume: 0.5});
+            this.deathSound.play( {volume: 0.4});
             this._restartScene();
         }
     }
@@ -439,7 +441,7 @@ export default class StageSceneBase extends Phaser.Scene {
     };
 
     _onCollectableCollide = () => {
-        this.crystalSound.play( {volume: 0.5});
+        this.crystalSound.play( {volume: this.collectableVol});
         this.collectableCount--;
         console.log(this.collectableCount);
     };
