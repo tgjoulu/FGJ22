@@ -11,7 +11,6 @@ export default class MainMenuScene extends Phaser.Scene {
 
     private controls: Input;
 
-
     constructor() {
         super('main-menu');
     }
@@ -37,6 +36,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
         this.load.tilemapTiledJSON('stage_3_map', `assets/tilemaps/stage_3.json`);
         this.load.tilemapTiledJSON('stage_4_map', `assets/tilemaps/stage_4.json`);
+        this.load.tilemapTiledJSON('stage_5_map', `assets/tilemaps/stage_5.json`);
         this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,
@@ -99,7 +99,9 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.controls.on('inputDown', () => this.selectNextButton(1));
         this.controls.on('inputUp', () => this.selectNextButton(-1));
-        this.controls.on('inputJump', () => {this.confirmSelection()});
+        this.controls.on('inputJump', () => {
+            this.confirmSelection();
+        });
     }
 
     selectButton(index: number) {

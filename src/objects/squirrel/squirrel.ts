@@ -177,13 +177,13 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     onWorldChange = (activeWorld: 0 | 1) => {
         //  Fixes bug where enemies go through floor
         this.body.setAllowGravity(false);
-        this.body.setGravityY(-400);
+        this.setVelocityY(-6);
 
         setTimeout(() => {
             if (this && this.body) {
-                this.body.setGravityY(Constants.GRAVITY_Y);
+                this.body.setAllowGravity(true);
             }
-        }, 500);
+        }, 100);
 
         switch (activeWorld) {
             case 0:
