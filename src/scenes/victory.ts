@@ -10,6 +10,7 @@ export default class VictoryScene extends Phaser.Scene {
 
     preload() {
         this.load.image('end_menu', 'assets/sprites/end_menu.png');
+        this.load.audio('outro_music', 'assets/sound/outro.mp3');
     }
 
     create() {
@@ -19,6 +20,8 @@ export default class VictoryScene extends Phaser.Scene {
         this.background.setOrigin(0);
         this.background.setScrollFactor(0.1, 0);
         this.background.setTilePosition(this.cameras.main.scrollX);
+        const bgSound = this.sound.add('outro_music', { loop: false });
+        bgSound.play( {volume: 0.5} );
         this.controls.on('inputAnyKey', () => {
             window.location.reload();
         });
