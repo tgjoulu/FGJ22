@@ -20,7 +20,8 @@ export default class VictoryScene extends Phaser.Scene {
         this.background.setScrollFactor(0.1, 0);
         this.background.setTilePosition(this.cameras.main.scrollX);
         this.controls.on('inputAnyKey', () => {
-            window.location.reload();
+            // window.location.reload();
+            this.scene.start('MainMenuScene');
         });
     }
 

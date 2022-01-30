@@ -21,6 +21,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private stage3Key: Phaser.Input.Keyboard.Key;
     private stage4Key: Phaser.Input.Keyboard.Key;
     private stage5Key: Phaser.Input.Keyboard.Key;
+    private stage6Key: Phaser.Input.Keyboard.Key;
     private restartKey: Phaser.Input.Keyboard.Key;
     private lightWorldCollider: Phaser.Physics.Arcade.Collider;
     private darkWorldCollider: Phaser.Physics.Arcade.Collider;
@@ -302,6 +303,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.stage3Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
         this.stage4Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
         this.stage5Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FIVE);
+        this.stage6Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SIX);
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.worldSwapKey.on('down', () => {
@@ -339,6 +341,10 @@ export default class StageSceneBase extends Phaser.Scene {
             console.log('debug: Stage5Scene');
             this._stopSounds();
             this.scene.start('Stage5Scene');
+        });
+        this.stage6Key.on('down', () => {
+            this._stopSounds();
+            this.scene.start('VictoryScene');
         });
     };
 

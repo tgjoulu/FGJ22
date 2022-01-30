@@ -98,7 +98,7 @@ export default class MainMenuScene extends Phaser.Scene {
         const startButton = this.add.image(width * 0.5, height * 0.7, 'start');
         startButton.setScale(0.5);
         startButton.setInteractive();
-        startButton.on('pointerdown', () => this.confirmSelection());
+        startButton.on('pointerdown', () => this._startTheGame());
 
         const _mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
         _mainmenuMusic.play({ volume: 0.5 });
@@ -112,12 +112,11 @@ export default class MainMenuScene extends Phaser.Scene {
         this.selectButton(0);
 
         startButton.on('selected', () => {
-            this.mainmenuMusic.stop();
-            this.scene.start('Stage1Scene');
+            this._startTheGame();
         });
 
         this.controls.on('inputAnyKey', () => {
-            this.confirmSelection();
+            this._startTheGame();
         });
 
         const crystalAnimation = this.anims.create({
@@ -133,17 +132,17 @@ export default class MainMenuScene extends Phaser.Scene {
         crystal.play('run');
     }
 
+    _startTheGame() {
+        this.mainmenuMusic.stop();
+        this.scene.start('Stage1Scene');
+    }
+
     selectButton(index: number) {
         const currentButton = this.buttons[this.selectedButtonIndex];
 
         currentButton.setTint(0xffffff);
 
         const button = this.buttons[index];
-
-        //button.setTint(0x66ff7f);
-
-        //this.buttonSelector.x = button.x + button.displayWidth * 0.5;
-        //this.buttonSelector.y = button.y + 10;
 
         this.selectedButtonIndex = index;
     }
@@ -157,11 +156,5 @@ export default class MainMenuScene extends Phaser.Scene {
         }
 
         this.selectButton(index);
-    }
-
-    confirmSelection() {
-        const button = this.buttons[this.selectedButtonIndex];
-
-        button.emit('selected');
     }
 }
