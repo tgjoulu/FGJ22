@@ -18,11 +18,15 @@ const config: Phaser.Types.Core.GameConfig = {
     },
     scale: {
         parent: 'phaser-game',
-        mode: Phaser.Scale.NONE,
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: Constants.DESIGN_WIDTH,
         height: Constants.DESIGN_HEIGHT,
         zoom: 2,
+        max: {
+          width: Constants.DESIGN_WIDTH,
+          height: Constants.DESIGN_HEIGHT,
+        }
     },
     scene: [MainMenuScene, Stage1Scene, Stage2Scene, Stage3Scene, Stage4Scene, UIScene],
     physics: {
@@ -33,9 +37,10 @@ const config: Phaser.Types.Core.GameConfig = {
             gravity: { y: Constants.GRAVITY_Y },
         },
     },
-    title: 'TODO',
+    title: 'Crystal Fusion',
     input: {
       gamepad: true,
+      activePointers: 2,
     },
 };
 

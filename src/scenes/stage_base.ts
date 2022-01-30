@@ -125,7 +125,7 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _restartScene() {
-        this._stopSounds;
+        this._stopSounds();
         this.scene.restart();
     }
 
@@ -286,7 +286,6 @@ export default class StageSceneBase extends Phaser.Scene {
             this.events.emit('onWorldChange', activeWorldSide);
         });
         this.restartKey.on('down', () => {
-            this._stopSounds();
             this._restartScene();
         });
         this.stage1Key.on('down', () => {
@@ -371,7 +370,6 @@ export default class StageSceneBase extends Phaser.Scene {
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
             console.log('RESTART');
-            this._stopSounds();
             this._restartScene();
         }
     }
