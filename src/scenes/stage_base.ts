@@ -119,9 +119,13 @@ export default class StageSceneBase extends Phaser.Scene {
 
     sceneFinish() {}
 
-    _restartScene() {
+    _stopSounds() {
         this.bgAnalogMusicLoops.map((s) => s.stop());
         this.bgDigitalMusicLoops.map((s) => s.stop());
+    }
+
+    _restartScene() {
+        this._stopSounds();
         this.scene.restart();
     }
 
@@ -160,15 +164,16 @@ export default class StageSceneBase extends Phaser.Scene {
         }
 
         collectables.objects.forEach((obj) => {
-            // TODO oravalle waypointit = obj.x -> obj.x + obj.width
             const directions = ['left', 'right'] as ['left', 'right'];
             const direction = directions[Math.floor(Math.random() * 2)];
+
             const squirrel = new Squirrel(
                 this,
                 obj.x! + obj.width! / 2,
                 obj.y!,
                 direction,
-                this.player
+                this.player,
+                { minX: obj.x!, maxX: obj.x! + obj.width! }
             );
             this.squirrels.add(squirrel);
             this.enemyDetectZones.add(new LookupZone(this, 100, 200, squirrel, this.player));
@@ -229,6 +234,7 @@ export default class StageSceneBase extends Phaser.Scene {
             this.squirrels,
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
+                    this._stopSounds();
                     this.player._killPlayer();
                 }
             }
@@ -284,18 +290,22 @@ export default class StageSceneBase extends Phaser.Scene {
         });
         this.stage1Key.on('down', () => {
             console.log('debug: Stage1Scene');
+            this._stopSounds();
             this.scene.start('Stage1Scene');
         });
         this.stage2Key.on('down', () => {
             console.log('debug: Stage2Scene');
+            this._stopSounds();
             this.scene.start('Stage2Scene');
         });
         this.stage3Key.on('down', () => {
             console.log('debug: Stage3Scene');
+            this._stopSounds();
             this.scene.start('Stage3Scene');
         });
         this.stage4Key.on('down', () => {
             console.log('debug: Stage4Scene');
+            this._stopSounds();
             this.scene.start('Stage4Scene');
         });
     };
@@ -353,6 +363,7 @@ export default class StageSceneBase extends Phaser.Scene {
     _finishStage() {
         // TODO näytä jotain paskaa
         console.log('Finish stage, TODO transition juttu');
+        this._stopSounds();
         this.scene.start(this.nextStageName);
     }
 
