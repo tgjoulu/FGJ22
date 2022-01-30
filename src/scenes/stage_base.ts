@@ -36,6 +36,8 @@ export default class StageSceneBase extends Phaser.Scene {
     private deathSound: Phaser.Sound.BaseSound;
     private teleportSound: Phaser.Sound.BaseSound;
     private crystalSound: Phaser.Sound.BaseSound;
+    private waveSound: Phaser.Sound.BaseSound;
+    private wolfSound: Phaser.Sound.BaseSound;
 
     private bgAnalogMusicLoops: Phaser.Sound.BaseSound[];
     private bgDigitalMusicLoops: Phaser.Sound.BaseSound[];
@@ -98,6 +100,8 @@ export default class StageSceneBase extends Phaser.Scene {
         this.crystalSound = this.sound.add('crystal');
         this.deathSound = this.sound.add('death1');
         this.teleportSound = this.sound.add('teleport');
+        this.waveSound = this.sound.add('wave');
+        this.wolfSound = this.sound.add('wolf');
 
         this.analDrumVol = 0.05;
         this.analBassVol = 1;
@@ -246,7 +250,8 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
-                    this.deathSound.play();
+                    this.wolfSound.play( {volume: 0.7});
+                    this.deathSound.play( {volume: 0.7});
                     this.player._killPlayer();
                 }
             }
@@ -297,6 +302,8 @@ export default class StageSceneBase extends Phaser.Scene {
                 this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light;
             this._enableWorld(activeWorldSide);
             this.events.emit('onWorldChange', activeWorldSide);
+            // Flash on world change
+            this.cameras.main.flash(500, 115, 30, 62);
         });
         this.restartKey.on('down', () => {
             this._restartScene();
@@ -387,7 +394,7 @@ export default class StageSceneBase extends Phaser.Scene {
             callbackScope: this,
         });
         this.player.body.moves = false;
-        this.teleportSound.play();
+        this.teleportSound.play( {volume: 0.7});
         this._stopSounds();
     }
 
@@ -397,7 +404,7 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            this.deathSound.play();
+            this.deathSound.play( {volume: 0.5});
             this._restartScene();
         }
     }
@@ -414,16 +421,20 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _onPlayerWaveCollide = () => {
+        this.waveSound.play({volume: 0.5});
         if (this.activeWorldSide == WorldSide.Light) {
             this._enableWorld(WorldSide.Dark);
             this.events.emit('onWorldChange', WorldSide.Dark);
+            this.cameras.main.flash(500, 115, 30, 62);
         } else {
             this._enableWorld(WorldSide.Light);
             this.events.emit('onWorldChange', WorldSide.Light);
+            this.cameras.main.flash(500, 115, 30, 62);
         }
     };
 
     _onCollectableCollide = () => {
+        this.crystalSound.play( {volume: 0.5});
         this.collectableCount--;
         console.log(this.collectableCount);
     };
