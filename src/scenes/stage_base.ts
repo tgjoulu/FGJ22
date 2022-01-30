@@ -355,7 +355,6 @@ export default class StageSceneBase extends Phaser.Scene {
         this._checkEnemyBounds();
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0) {
-            console.log(this.nextStageName);
             if (this.nextStageName) {
                 this._finishStage();
             } else {
@@ -373,7 +372,6 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            console.log('RESTART');
             this._restartScene();
         }
     }
