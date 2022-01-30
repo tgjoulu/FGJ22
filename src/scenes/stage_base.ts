@@ -456,7 +456,6 @@ export default class StageSceneBase extends Phaser.Scene {
         if (this.activeWorldSide == WorldSide.Light) {
             for (const foo of this.bgAnalogMusicLoops) {
                 if (soundRef.key === foo.key) {
-                    console.log(`Looping sound ${soundRef.key}`);
                     soundFound = true;
                     soundRef.play();
                 }
@@ -464,7 +463,6 @@ export default class StageSceneBase extends Phaser.Scene {
         } else {
             for (const foo of this.bgDigitalMusicLoops) {
                 if (soundRef.key === foo.key) {
-                    console.log(`Looping sound ${soundRef.key}`);
                     soundFound = true;
                     soundRef.play();
                 }
@@ -478,19 +476,15 @@ export default class StageSceneBase extends Phaser.Scene {
                     if (soundRef.key == 'digiDrums') {
                         this.bgAnalogMusicLoops[0].play({ volume: this.analDrumVol });
                         this.bgDigitalMusicLoops[0].stop();
-                        console.log('Switching to analDrums');
                     } else if (soundRef.key == 'digiBass') {
                         this.bgAnalogMusicLoops[1].play({ volume: this.analBassVol });
                         this.bgDigitalMusicLoops[1].stop();
-                        console.log('Switching to analBass');
                     } else if (soundRef.key == 'digiPads') {
                         this.bgAnalogMusicLoops[2].play({ volume: this.digiBassVol });
                         this.bgDigitalMusicLoops[2].stop();
-                        console.log('Switching to analPads');
                     } else if (soundRef.key == 'digiLead') {
                         this.bgAnalogMusicLoops[3].play({ volume: this.digiBassVol });
                         this.bgDigitalMusicLoops[3].stop();
-                        console.log('Switching to analLead');
                     } else {
                         console.log(`Not found: ${soundRef.key}`);
                     }
@@ -503,19 +497,15 @@ export default class StageSceneBase extends Phaser.Scene {
                     if (soundRef.key == 'analDrums') {
                         this.bgDigitalMusicLoops[0].play({ volume: this.digiDrumVol });
                         this.bgAnalogMusicLoops[0].stop();
-                        console.log('Switching to digiDrums');
                     } else if (soundRef.key == 'analBass') {
                         this.bgDigitalMusicLoops[1].play({ volume: this.digiBassVol });
                         this.bgAnalogMusicLoops[1].stop();
-                        console.log('Switching to digiBass');
                     } else if (soundRef.key == 'analPads') {
                         this.bgDigitalMusicLoops[2].play({ volume: this.digiBassVol });
                         this.bgAnalogMusicLoops[2].stop();
-                        console.log('Switching to digiPads');
                     } else if (soundRef.key == 'analLead') {
                         this.bgDigitalMusicLoops[3].play({ volume: this.digiBassVol });
                         this.bgAnalogMusicLoops[3].stop();
-                        console.log('Switching to digiLead');
                     } else {
                         console.log(`Not found: ${soundRef.key}`);
                     }

@@ -14,6 +14,7 @@ import VictoryScene from './scenes/victory';
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     backgroundColor: '#ffffff',
+    antialias: false,
     pixelArt: true,
     render: {
         pixelArt: true,
