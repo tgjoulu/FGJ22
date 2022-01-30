@@ -1,4 +1,3 @@
-import ArcadePhysicsCallback from 'phaser';
 import Constants from '../../constants';
 import Player from '../../player/player';
 
