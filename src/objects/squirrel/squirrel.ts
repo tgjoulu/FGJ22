@@ -48,8 +48,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
         this.body.onWorldBounds = true;
 
         this.body.setBoundsRectangle(new Phaser.Geom.Rectangle(0, 220, 1024, 400));
-        this.body.setSize(18, 28).setImmovable(true);
-
+        this.body.setImmovable(true);
         // Stop velocity when hitting world bounds
         scene.physics.world.on('worldbounds', () => {
             if (this) {
@@ -177,7 +176,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
     onWorldChange = (activeWorld: 0 | 1) => {
         //  Fixes bug where enemies go through floor
         this.body.setAllowGravity(false);
-        this.setVelocityY(-6);
+        this.body.setVelocityY(-6);
 
         setTimeout(() => {
             if (this && this.body) {
