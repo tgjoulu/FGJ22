@@ -46,10 +46,6 @@ export default class MainMenuScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 32,
         });
-        this.load.spritesheet('collectable_big', 'assets/sprites/crystal_big_sheet.png', {
-            frameWidth: 64,
-            frameHeight: 64,
-        });
         this.load.spritesheet('squirrel', 'assets/sprites/squirrel_sheet.png', {
             frameWidth: 32,
             frameHeight: 32,
@@ -89,7 +85,6 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     create() {
-        console.log('mainmenu created');
         this.controls = new Input(this);
         const { width, height } = this.scale;
 
@@ -126,7 +121,7 @@ export default class MainMenuScene extends Phaser.Scene {
             repeat: -1,
         });
 
-        const crystal = this.add.sprite(64, 64, 'collectable_big');
+        const crystal = this.add.sprite(64, 64, 'collectable');
         crystal.setScale(4);
         crystal.setPosition(width * 0.5, height * 0.3);
         crystal.play('run');

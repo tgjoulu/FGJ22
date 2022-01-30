@@ -469,7 +469,6 @@ export default class StageSceneBase extends Phaser.Scene {
             }
         }
         if (!soundFound) {
-            console.log(`Should swap: ${soundRef.key}`);
             if (this.activeWorldSide == WorldSide.Light) {
                 const keys = this.bgDigitalMusicLoops.map((x) => x.key);
                 if (keys.indexOf(soundRef.key) > -1) {
