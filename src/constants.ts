@@ -5,6 +5,7 @@ const Constants = {
     WINDOW_HEIGHT: 720,
     TILE_SIZE: 32,
     SCALE: 2,
+    GRAVITY_Y: 275,
 };
 
 export default Constants;

@@ -1,10 +1,12 @@
 import { Scene } from 'phaser';
+import StageSceneBase from '../scenes/stage_base';
+import Input from '../input';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    private moveRightKey: Phaser.Input.Keyboard.Key;
-    private moveLeftKey: Phaser.Input.Keyboard.Key;
-    private jumpKey: Phaser.Input.Keyboard.Key;
+    private controls: Input;
+
+    // How long dead animation lasts
+    readonly deadAnimationCount = 50;
     private runSpeed: number = 220;
     private jumpForce: number = 200;
     private acceleration: number = 180;
@@ -16,28 +18,28 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private drag: number = 600;
     private airDrag: number = 1500;
     private wallJumpForceY: number = 150;
-    private wallJumpForceX: number = 180;
+    private wallJumpForceX: number = 190;
     private wallJumpTriggerEaseMS = 150; // Should be less than turnDelayMS
     private groundTouchTriggerEaseMS = 100;
     private lastWallTouchLeft: number = 0;
     private lastWallTouchRight: number = 0;
     private lastGroundTouch: number = 0;
     private curTime: number = 0;
+    private deadAnimationDelta = 0;
+    private isDying: boolean;
 
     body: Phaser.Physics.Arcade.Body;
 
     public init(scene: Phaser.Scene) {
-        this.cursors = scene.input.keyboard.createCursorKeys();
-        this.moveRightKey = scene.input.keyboard.addKey('D');
-        this.moveLeftKey = scene.input.keyboard.addKey('A');
-        this.jumpKey = scene.input.keyboard.addKey('SPACE');
+        this.controls = new Input(scene);
+
         this.setBounce(0.01);
         this.setDragX(this.drag);
         this.setMaxVelocity(this.runSpeed, this.jumpForce);
         this._initAnims();
+        this._bindKeys();
 
         //this.setCollideWorldBounds(true, 0, 0);
-        this._bindKeys();
         this.body.setSize(18, 32);
         //   this.setOffset(14, 14);
     }
@@ -45,18 +47,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     _initAnims() {
         this.anims.create({
             key: 'walk',
-            frameRate: 8,
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+            frameRate: 10,
+            frames: this.anims.generateFrameNumbers('player', { start: 1, end: 4 }),
             repeat: -1,
         });
     }
 
     _bindKeys() {
-        this.jumpKey.on('down', () => {
+        this.controls.on('inputJump', () => {
             if (this._canJump()) {
                 this.setVelocityY(-this.jumpForce);
                 this.stop();
-                this.setFrame(0);
+                this.setFrame(2);
             } else if (this._canWallJump()) {
                 this.setVelocityY(-this.wallJumpForceY);
                 const wallJumpLeft = this.lastWallTouchLeft > this.lastWallTouchRight;
@@ -64,13 +66,25 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setAccelerationX(this.airAcceleration * (wallJumpLeft ? 1 : -1));
                 this.curTurnDelayMS = this.turnDelayMS;
                 this.setDragX(this.drag);
-                this.setFlipX(this.body.blocked.right);
-                console.log(this.body.acceleration.x);
+                this.setFlipX(!wallJumpLeft);
+                this.stop();
+                this.setFrame(2);
             }
-        });
+        })
     }
 
     update(time: number, dt: number) {
+        if (this.isDying) {
+            this.setRotation(this.rotation + 0.04 * dt);
+            this.setVelocityY(-130);
+            this.deadAnimationDelta = this.deadAnimationDelta + 1;
+
+            if (this.deadAnimationDelta > this.deadAnimationCount) {
+                this.isDying = false;
+                (this.scene as StageSceneBase)._restartScene();
+            }
+        }
+
         this.curTime = time;
         if (this.curTurnDelayMS > 0) {
             this.curTurnDelayMS -= dt;
@@ -80,28 +94,39 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this._updateWallTouch(time);
         const grounded = this.body.blocked.down;
         this.setDragX(grounded ? this.drag : this.airDrag);
-        if (this.moveRightKey.isDown) {
+
+        if (this.controls.isRightKeyDown()) {
             this.setAccelerationX(grounded ? this.acceleration : this.airAcceleration);
             if (this.body.velocity.x < this.turnSpeed) {
                 this.setVelocityX(grounded ? this.turnSpeed : this.airTurnSpeed);
             }
             if (grounded) {
-                this.play('walk', true);
+                this._playWalkAnimation();
             }
             this.setFlipX(false);
-        } else if (this.moveLeftKey.isDown) {
+        } else if (this.controls.isLeftKeyDown()) {
             this.setAccelerationX(grounded ? -this.acceleration : -this.airAcceleration);
             if (this.body.velocity.x > -this.turnSpeed) {
                 this.setVelocityX(grounded ? -this.turnSpeed : -this.airTurnSpeed);
             }
             this.setFlipX(true);
             if (grounded) {
-                this.play('walk', true);
+                this._playWalkAnimation();
             }
         } else {
             this.setAccelerationX(0);
-            this.stop();
+            if (Math.abs(this.body.velocity.x) < 5) {
+                this.setFrame(0);
+                this.stop();
+            }
         }
+    }
+
+    _playWalkAnimation() {
+        if (this.anims.isPlaying && this.anims.currentAnim.key === 'walk') {
+            return;
+        }
+        this.play('walk', true);
     }
 
     _canJump(): boolean {
@@ -129,5 +154,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             (this.curTime - this.lastWallTouchLeft < this.wallJumpTriggerEaseMS ||
                 this.curTime - this.lastWallTouchRight < this.wallJumpTriggerEaseMS)
         );
+    }
+
+    _killPlayer() {
+        this.isDying = true;
+        this.deadAnimationDelta = 0;
     }
 }

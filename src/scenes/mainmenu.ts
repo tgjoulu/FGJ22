@@ -1,12 +1,15 @@
 import Phaser from 'phaser';
 
+import Input from '../input';
+
 export default class MainMenuScene extends Phaser.Scene {
-    private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private buttons: Phaser.GameObjects.Image[] = [];
     private selectedButtonIndex = 0;
     private buttonSelector!: Phaser.GameObjects.Image;
 
     private mainmenuMusic: Phaser.Sound.BaseSound;
+
+    private controls: Input;
 
 
     constructor() {
@@ -14,7 +17,7 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     init() {
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.controls = new Input(this);
     }
 
     preload() {
@@ -32,24 +35,33 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.image('duality_tileset', 'assets/sprites/duality_tileset.png');
         this.load.tilemapTiledJSON('stage_1_map', `assets/tilemaps/stage_1.json`);
         this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
+        this.load.tilemapTiledJSON('stage_3_map', `assets/tilemaps/stage_3.json`);
+        this.load.tilemapTiledJSON('stage_4_map', `assets/tilemaps/stage_4.json`);
         this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,
         });
-        this.load.spritesheet('collectable', 'assets/sprites/tileset_dev.png', {
+        this.load.spritesheet('collectable', 'assets/sprites/crystal_sheet.png', {
             frameWidth: 32,
             frameHeight: 32,
         });
-        this.load.spritesheet('squirrel', 'assets/sprites/squirrel.png', {
+        this.load.spritesheet('squirrel', 'assets/sprites/squirrel_sheet.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+        });
+        this.load.spritesheet('wolf', 'assets/sprites/wolf_sheet.png', {
             frameWidth: 40,
             frameHeight: 40,
         });
-        this.load.spritesheet('wolf', 'assets/sprites/wolf.png', {
-            frameWidth: 40,
-            frameHeight: 40,
-        });
-        this.load.audio('drums', 'assets/sound/drums.wav');
-        this.load.audio('bass', 'assets/sound/bass.wav');
+        this.load.audio('analDrums', 'assets/sound/AnalogDrums.wav');
+        this.load.audio('analBass', 'assets/sound/AnalogBass.wav');
+        this.load.audio('analPads', 'assets/sound/AnalogPads.wav');
+        this.load.audio('analLead', 'assets/sound/AnalogLead.wav');
+
+        this.load.audio('digiDrums', 'assets/sound/drums.wav');
+        this.load.audio('digiBass', 'assets/sound/bass.wav');
+        this.load.audio('digiPads', 'assets/sound/pads.wav');
+        this.load.audio('digiLead', 'assets/sound/lead.wav');
 
         this.load.audio('mainmenu_music', 'assets/sound/mainmenu.mp3');
 
@@ -62,14 +74,15 @@ export default class MainMenuScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
         const startButton = this.add.image(width * 0.5, height * 0.4, 'start');
-        const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
+        startButton.setInteractive();
+        // const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
 
         const _mainmenuMusic = this.sound.add('mainmenu_music', { loop: false });
-        _mainmenuMusic.play({volume: 0.5});
+        _mainmenuMusic.play({ volume: 0.5 });
         this.mainmenuMusic = _mainmenuMusic;
 
         this.buttons.push(startButton);
-        this.buttons.push(anotherButton);
+        // this.buttons.push(anotherButton);
 
         this.buttonSelector = this.add.image(0, 0, '');
 
@@ -79,6 +92,10 @@ export default class MainMenuScene extends Phaser.Scene {
             this.mainmenuMusic.stop();
             this.scene.start('Stage1Scene');
         });
+
+        this.controls.on('inputDown', () => this.selectNextButton(1));
+        this.controls.on('inputUp', () => this.selectNextButton(-1));
+        this.controls.on('inputJump', () => {this.confirmSelection()});
     }
 
     selectButton(index: number) {
@@ -111,19 +128,5 @@ export default class MainMenuScene extends Phaser.Scene {
         const button = this.buttons[this.selectedButtonIndex];
 
         button.emit('selected');
-    }
-
-    update() {
-        const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up);
-        const downJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.down);
-        const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space);
-
-        if (upJustPressed) {
-            this.selectNextButton(-1);
-        } else if (downJustPressed) {
-            this.selectNextButton(1);
-        } else if (spaceJustPressed) {
-            this.confirmSelection();
-        }
     }
 }

@@ -1,78 +1,185 @@
-import ArcadePhysicsCallback from 'phaser';
+import Constants from '../../constants';
+import Player from '../../player/player';
 
 export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
+    player: Player;
+    body: Phaser.Physics.Arcade.Body;
+
     // Constants
-    readonly bunnySpeed = 0.2;
-    readonly wolfSpeed = 0.5;
-    readonly walkingDistance = 30;
+    readonly squirrelSpeed = 0.02;
+    readonly squirrelSpeedFast = 0.08;
+    readonly wolfSpeed = 0.08;
+    readonly wolfSpeedFast = 0.1;
+    readonly waitingTimeBetweenMove = 100;
 
     private originalX: number;
-    private walking = true;
-    private detectingPlayer = false;
+    private waiting = true;
+    private isDetectingPlayer = false;
     private direction: 'left' | 'right';
+    private waitingDelta = 0;
+    private minX: number;
+    private maxX: number;
 
-    enemyType: 'dark' | 'light' = 'dark';
+    enemyType: 'dark' | 'light' = 'light';
 
-    lookupZone: Phaser.GameObjects.Graphics;
-
-    constructor(scene: Phaser.Scene, x: number, y: number, direction: 'left' | 'right') {
+    constructor(
+        scene: Phaser.Scene,
+        x: number,
+        y: number,
+        direction: 'left' | 'right',
+        player: Player,
+        waypoints: { minX: number; maxX: number }
+    ) {
         super(scene, x, y, 'squirrel');
         this.originalX = x;
         this.direction = direction;
+        this.player = player;
+        this.minX = waypoints.minX;
+        this.maxX = waypoints.maxX;
+
+        if (this.direction === 'right') {
+            this.flipX = true;
+        }
 
         scene.add.existing(this);
 
         // Physics
         scene.physics.add.existing(this);
-        this.setCollideWorldBounds(true);
-        (this.body as Phaser.Physics.Arcade.Body).onWorldBounds = true;
+        this.body = this.body as Phaser.Physics.Arcade.Body;
 
-        (this.body as Phaser.Physics.Arcade.Body).setBoundsRectangle(
-            new Phaser.Geom.Rectangle(0, 220, 1024, 400)
-        );
-        this.body.setSize(18, 28);
+        this.setCollideWorldBounds(true);
+        this.body.onWorldBounds = true;
+
+        this.body.setBoundsRectangle(new Phaser.Geom.Rectangle(0, 220, 1024, 400));
+        this.body.setSize(18, 28).setImmovable(true);
 
         // Stop velocity when hitting world bounds
         scene.physics.world.on('worldbounds', () => {
-            this.setVelocity(0);
-            this.stop();
+            if (this) {
+                this.setVelocity(0);
+                this.stop();
+            }
         });
 
-        // Add lookup zone
-        this.lookupZone = scene.add.graphics({ fillStyle: { color: 0xff0000 } });
-        this.lookupZone.displayOriginX = 80;
-        this.lookupZone.displayOriginY = 80;
-        var circle = new Phaser.Geom.Circle(this.x, this.y, 80);
-        this.lookupZone.fillCircleShape(circle);
-        scene.physics.add.existing(this.lookupZone);
-        (this.lookupZone.body as ArcadePhysicsCallback.Physics.Arcade.Body)
-            .setAllowGravity(false)
-            .setCircle(80);
-        this.lookupZone.on('onCollide', () => console.log('lol'));
+        this._initAnims();
+    }
+
+    _initAnims() {
+        this.anims.create({
+            key: 'walk',
+            frameRate: 4,
+            frames: this.anims.generateFrameNumbers('squirrel', { start: 0, end: 2 }),
+            repeat: -1,
+        });
+
+        this.anims.create({
+            key: 'wolf_walk',
+            frameRate: 4,
+            frames: this.anims.generateFrameNumbers('wolf', { start: 0, end: 1 }),
+            repeat: -1,
+        });
+
+        this.play(this.enemyType === 'light' ? 'walk' : 'wolf_walk', true);
     }
 
     update(time: number, dt: number) {
-        if (this.walking) {
+        if (this.isDetectingPlayer) {
+            this.waiting = false;
+        }
+        if (!this.waiting) {
+            this.play(this.enemyType === 'light' ? 'walk' : 'wolf_walk', true);
+
+            // Light world squirrels run away
+            if (this.isDetectingPlayer && this.enemyType === 'light') {
+                if (this.x > this.player.x) {
+                    this.direction = 'right';
+                } else {
+                    this.direction = 'left';
+                }
+                // Dark world squirrels kill you
+            } else if (this.isDetectingPlayer && this.enemyType === 'dark') {
+                if (this.x > this.player.x) {
+                    this.direction = 'left';
+                } else {
+                    this.direction = 'right';
+                }
+            }
+
             switch (this.direction) {
                 case 'left':
-                    this.x = this.x - this.bunnySpeed;
-                    if (this.x < this.originalX - this.walkingDistance) {
+                    this.flipX = false;
+
+                    if (this.enemyType === 'light') {
+                        if (this.isDetectingPlayer) {
+                            this.x = this.x - this.squirrelSpeedFast * dt;
+                        } else {
+                            this.x = this.x - this.squirrelSpeed * dt;
+                        }
+                    } else if (this.enemyType === 'dark') {
+                        if (this.isDetectingPlayer) {
+                            this.x = this.x - this.wolfSpeedFast * dt;
+                        } else {
+                            this.x = this.x - this.wolfSpeed * dt;
+                        }
+                    }
+
+                    if (!this.isDetectingPlayer && this.x < this.minX) {
                         this.direction = 'right';
+                        this.waiting = true;
                     }
                     break;
                 case 'right':
-                    this.x = this.x + this.bunnySpeed;
-                    if (this.x > this.originalX + this.walkingDistance) {
+                    this.flipX = true;
+
+                    if (this.enemyType === 'light') {
+                        if (this.isDetectingPlayer) {
+                            this.x = this.x + this.squirrelSpeedFast * dt;
+                        } else {
+                            this.x = this.x + this.squirrelSpeed * dt;
+                        }
+                    } else if (this.enemyType === 'dark') {
+                        if (this.isDetectingPlayer) {
+                            this.x = this.x + this.wolfSpeedFast * dt;
+                        } else {
+                            this.x = this.x + this.wolfSpeed * dt;
+                        }
+                    }
+
+                    if (!this.isDetectingPlayer && this.x > this.maxX) {
                         this.direction = 'left';
+                        this.waiting = true;
                     }
                     break;
             }
+        } else {
+            this.play(this.enemyType === 'light' ? 'walk' : 'wolf_walk', false);
+            if (this.waitingDelta > this.waitingTimeBetweenMove) {
+                this.waiting = false;
+                this.waitingDelta = 0;
+            }
+            this.waitingDelta = this.waitingDelta + 1;
         }
-
-        this.lookupZone.setPosition(this.x, this.y);
     }
 
+    onPlayerDetected = () => {
+        this.isDetectingPlayer = true;
+    };
+
+    onLostPlayer = () => {
+        this.isDetectingPlayer = false;
+    };
+
     onWorldChange = (activeWorld: 0 | 1) => {
+        //  Fixes bug where enemies go through floor
+        this.body.setAllowGravity(false);
+        this.body.setGravityY(-400);
+
+        setTimeout(() => {
+            if (this && this.body) {
+                this.body.setGravityY(Constants.GRAVITY_Y);
+            }
+        }, 500);
+
         switch (activeWorld) {
             case 0:
                 this.enemyType = 'light';

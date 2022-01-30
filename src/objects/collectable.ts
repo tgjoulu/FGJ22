@@ -11,11 +11,24 @@ export default class Collectable extends Phaser.Physics.Arcade.Sprite {
 
         this.setTexture('collectable');
 
+        this._initAnims();
+
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
         this.body.setAllowGravity(false);
         this.setPushable(false);
+    }
+
+    _initAnims() {
+        this.anims.create({
+            key: 'idle',
+            frameRate: 4,
+            frames: this.anims.generateFrameNumbers('collectable', { start: 0, end: 3 }),
+            repeat: -1,
+        });
+
+        this.play('idle', true);
     }
 
     createPlayerCollider(object, callback) {
