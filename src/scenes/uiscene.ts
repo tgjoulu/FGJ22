@@ -19,12 +19,12 @@ export default class UIScene extends Phaser.Scene {
 
     create() {
         this.timeText = this.add.text(
-            this.cameras.main.width * 0.1,
-            this.cameras.main.height * 0.1,
+            this.cameras.main.width * 0.03,
+            this.cameras.main.height * 0.03,
             '0:00',
             {
-                fontFamily: '16px Courier',
-                fontSize: '16px',
+                fontFamily: '18px Courier',
+                fontSize: '18px',
             }
         );
 
@@ -46,8 +46,9 @@ export default class UIScene extends Phaser.Scene {
             targets: this.timeText,
             x: this.cameras.main.width / 2,
             y: this.cameras.main.height / 2,
+            scale: 2,
             ease: 'Bounce.EaseOut',
-            duration: 1000,
+            duration: 700,
         });
 
         this.levelFinished = true;
