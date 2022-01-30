@@ -405,8 +405,10 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _startNextScene() {
         if (this.nextStageName) {
+            this._stopSounds();
             this.scene.start(this.nextStageName);
         } else {
+            this._stopSounds();
             this.scene.remove('UIScene');
             this.scene.start('VictoryScene');
         }
