@@ -157,13 +157,13 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _addEnemies(tileMap: Phaser.Tilemaps.Tilemap) {
-        const collectables = tileMap.getObjectLayer('enemies');
-        if (!collectables) {
+        const enemies = tileMap.getObjectLayer('enemies');
+        if (!enemies) {
             // Not in every stage => ok
             return;
         }
 
-        collectables.objects.forEach((obj) => {
+        enemies.objects.forEach((obj) => {
             const directions = ['left', 'right'] as ['left', 'right'];
             const direction = directions[Math.floor(Math.random() * 2)];
 

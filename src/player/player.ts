@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import StageSceneBase from '../scenes/stage_base';
 import Input from '../input';
+import Constants from '../constants';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private controls: Input;
@@ -19,7 +20,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private airDrag: number = 1500;
     private wallJumpForceY: number = 150;
     private wallJumpForceX: number = 190;
-    private wallJumpTriggerEaseMS = 150; // Should be less than turnDelayMS
+    private wallJumpTriggerEaseMS = 250; // Should be less than turnDelayMS
     private groundTouchTriggerEaseMS = 100;
     private lastWallTouchLeft: number = 0;
     private lastWallTouchRight: number = 0;
@@ -27,6 +28,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     private curTime: number = 0;
     private deadAnimationDelta = 0;
     private isDying: boolean;
+    private wallHangDrag: number = 120;
 
     body: Phaser.Physics.Arcade.Body;
 
@@ -70,10 +72,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.stop();
                 this.setFrame(2);
             }
-        })
+        });
     }
 
     update(time: number, dt: number) {
+        this.setDragY(0);
+
         if (this.isDying) {
             this.setRotation(this.rotation + 0.04 * dt);
             this.setVelocityY(-130);
@@ -96,6 +100,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setDragX(grounded ? this.drag : this.airDrag);
 
         if (this.controls.isRightKeyDown()) {
+            if (this.body.blocked.right) {
+                this.setDragY(this.wallHangDrag);
+            }
             this.setAccelerationX(grounded ? this.acceleration : this.airAcceleration);
             if (this.body.velocity.x < this.turnSpeed) {
                 this.setVelocityX(grounded ? this.turnSpeed : this.airTurnSpeed);
@@ -105,6 +112,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             }
             this.setFlipX(false);
         } else if (this.controls.isLeftKeyDown()) {
+            if (this.body.blocked.left) {
+                this.setDragY(this.wallHangDrag);
+            }
             this.setAccelerationX(grounded ? -this.acceleration : -this.airAcceleration);
             if (this.body.velocity.x > -this.turnSpeed) {
                 this.setVelocityX(grounded ? -this.turnSpeed : -this.airTurnSpeed);
