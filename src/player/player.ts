@@ -54,7 +54,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     _bindKeys() {
-        this.scene.events.on('inputJump', () => {
+        this.controls.on('inputJump', () => {
             if (this._canJump()) {
                 this.setVelocityY(-this.jumpForce);
                 this.stop();

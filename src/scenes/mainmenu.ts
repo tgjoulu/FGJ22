@@ -86,10 +86,9 @@ export default class MainMenuScene extends Phaser.Scene {
             this.scene.start('Stage1Scene');
         });
 
-        // wtf scene.scene
-        this.scene.scene.events.on('inputDown', () => this.selectNextButton(1));
-        this.scene.scene.events.on('inputUp', () => this.selectNextButton(-1));
-        this.scene.scene.events.on('inputJump', () => {console.log("jump!"); this.confirmSelection()});
+        this.controls.on('inputDown', () => this.selectNextButton(1));
+        this.controls.on('inputUp', () => this.selectNextButton(-1));
+        this.controls.on('inputJump', () => {console.log("jump!"); this.confirmSelection()});
     }
 
     selectButton(index: number) {

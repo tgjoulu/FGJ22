@@ -6,7 +6,7 @@ interface Keys {
     down: Phaser.Input.Keyboard.Key,
 }
 
-export default class Input {
+export default class Input extends Phaser.Events.EventEmitter {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private keys: Keys;
     private gamepad: Phaser.Input.Gamepad.Gamepad;
@@ -14,6 +14,7 @@ export default class Input {
     private scene: Phaser.Scene;
 
     public constructor(scene: Phaser.Scene) {
+        super()
         // super('input')
         this.scene = scene;
         this.cursors = scene.input.keyboard.createCursorKeys();
@@ -37,11 +38,11 @@ export default class Input {
         this._setupKeyboardEvents();
     }
 
-    _emitJump() {this.scene.events.emit('inputJump');}
-    _emitLeft() {this.scene.events.emit('inputLeft');}
-    _emitRight() {this.scene.events.emit('inputRight');}
-    _emitUp() {this.scene.events.emit('inputUp');}
-    _emitDown() {this.scene.events.emit('inputDown');}
+    _emitJump() {this.emit('inputJump');}
+    _emitLeft() {this.emit('inputLeft');}
+    _emitRight() {this.emit('inputRight');}
+    _emitUp() {this.emit('inputUp');}
+    _emitDown() {this.emit('inputDown');}
 
     _setupGamepadEvents() {
         this.gamepad.on('down', () => {
