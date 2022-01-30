@@ -50,8 +50,8 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
 
         this.setAlpha(0.7);
 
-        this.particlesLeft = scene.add.particles('wolf');
-        this.particlesRight = scene.add.particles('wolf');
+        this.particlesLeft = scene.add.particles('particle');
+        this.particlesRight = scene.add.particles('particle');
         this.particlesLeft.createEmitter({
             y: { min: 0, max: this.scene.physics.world.bounds.bottom },
             angle: { start: 180, end: 360, steps: 32 },
