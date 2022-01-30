@@ -68,6 +68,7 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     create() {
+        this.stageFinished = false;
         const map = this.make.tilemap({ key: `${this.stageName}_map` });
         const tileSet = map.addTilesetImage('duality_tileset', 'duality_tileset');
         const spawnPoint = this._getSpawnPoint(map);
@@ -385,7 +386,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this._checkPlayerBounds();
         this._checkEnemyBounds();
         this.waveGroup.preUpdate(time, dt);
-        if (this.collectableCount == 0 && !this.stageFinished) {
+        if (this.collectableCount <= 0 && !this.stageFinished) {
             this.stageFinished = true;
             this._finishStage();
         }
@@ -448,7 +449,6 @@ export default class StageSceneBase extends Phaser.Scene {
     _onCollectableCollide = () => {
         this.crystalSound.play({ volume: this.collectableVol });
         this.collectableCount--;
-        console.log(this.collectableCount);
     };
 
     _onBgSoundComplete = (soundRef: any) => {
