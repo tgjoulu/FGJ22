@@ -61,6 +61,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setVelocityY(-this.jumpForce);
                 this.stop();
                 this.setFrame(2);
+                this.setDragY(0);
             } else if (this._canWallJump()) {
                 this.setVelocityY(-this.wallJumpForceY);
                 const wallJumpLeft = this.lastWallTouchLeft > this.lastWallTouchRight;
@@ -71,6 +72,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.setFlipX(!wallJumpLeft);
                 this.stop();
                 this.setFrame(2);
+                this.setDragY(0);
             }
         });
     }
