@@ -24,18 +24,10 @@ export default class UIScene extends Phaser.Scene {
 
     create() {
         this.timerbg = this.add.image(
-<<<<<<< HEAD
             this.cameras.main.width * 0.060,
             this.cameras.main.height * 0.08,
             'timerbg');
         
-=======
-            this.cameras.main.width * 0.06,
-            this.cameras.main.height * 0.045,
-            'timerbg'
-        );
-
->>>>>>> b206663691932648dbbe39a9f5321a325aeb4e51
         this.timeText = this.add.text(
             this.cameras.main.width * 0.03,
             this.cameras.main.height * 0.03,
