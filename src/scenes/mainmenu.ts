@@ -35,6 +35,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.load.image('particle', 'assets/sprites/particle.png');
 
+        this.load.image('timerbg', 'assets/sprites/endtime.png');
+
         this.load.tilemapTiledJSON('stage_1_map', `assets/tilemaps/stage_1.json`);
         this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
         this.load.tilemapTiledJSON('stage_3_map', `assets/tilemaps/stage_3.json`);
