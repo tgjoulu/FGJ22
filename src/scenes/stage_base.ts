@@ -257,8 +257,8 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
-                    this.wolfSound.play( {volume: 0.7});
-                    this.deathSound.play( {volume: 0.7});
+                    this.wolfSound.play( {volume: 0.5});
+                    this.deathSound.play( {volume: 0.5});
                     this.player._killPlayer();
                 }
             }
