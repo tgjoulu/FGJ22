@@ -31,7 +31,7 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         this.setTexture('waveSprite');
 
         this.displayHeight = height * 2;
- 
+
         this.setOrigin(0.5, 0);
 
         scene.waveGroup.add(this, true);
@@ -44,6 +44,8 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         this.player = player;
         this.playerCollideCallback = overlapCallback;
         this.createPlayerCollider();
+
+        this.setAlpha(0.7);
     }
 
     _initAnims() {
