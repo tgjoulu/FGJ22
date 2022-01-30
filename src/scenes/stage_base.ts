@@ -32,10 +32,10 @@ export default class StageSceneBase extends Phaser.Scene {
     private squirrels: Phaser.Physics.Arcade.Group;
     private enemyDetectZones: Phaser.Physics.Arcade.StaticGroup;
 
-    private digiDrums: Phaser.Sound.BaseSound;
-    private digiBass: Phaser.Sound.BaseSound;
-    private analDrums: Phaser.Sound.BaseSound;
-    private analBass: Phaser.Sound.BaseSound;
+    private deathSound: Phaser.Sound.BaseSound;
+    private teleportSound: Phaser.Sound.BaseSound;
+    private crystalSound: Phaser.Sound.BaseSound;
+
     private bgAnalogMusicLoops: Phaser.Sound.BaseSound[];
     private bgDigitalMusicLoops: Phaser.Sound.BaseSound[];
 
@@ -93,6 +93,11 @@ export default class StageSceneBase extends Phaser.Scene {
         const bgDigiBass = this.sound.add('digiBass', { loop: false });
         const bgDigiPads = this.sound.add('digiPads', { loop: false });
         const bgDigiLead = this.sound.add('digiLead', { loop: false });
+
+        this.crystalSound = this.sound.add('crystal');
+        this.deathSound = this.sound.add('death1');
+        this.teleportSound = this.sound.add('teleport');
+
 
         this.analDrumVol = 0.05;
         this.analBassVol = 1;
@@ -241,6 +246,7 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
+                    this.deathSound.play();
                     this.player._killPlayer();
                 }
             }
@@ -375,6 +381,7 @@ export default class StageSceneBase extends Phaser.Scene {
             callbackScope: this,
         });
         this.player.body.moves = false;
+        this.teleportSound.play();
         this._stopSounds();
     }
 
@@ -384,6 +391,7 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
+            this.deathSound.play();
             this._restartScene();
         }
     }
