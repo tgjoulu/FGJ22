@@ -49,7 +49,7 @@ export default class MainMenuScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 32,
         });
-        this.load.spritesheet('wolf', 'assets/sprites/wolf.png', {
+        this.load.spritesheet('wolf', 'assets/sprites/wolf_sheet.png', {
             frameWidth: 40,
             frameHeight: 40,
         });
