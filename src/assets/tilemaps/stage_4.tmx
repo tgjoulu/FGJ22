@@ -208,8 +208,8 @@
   </object>
  </objectgroup>
  <objectgroup id="9" name="enemies">
-  <object id="8" name="enemy" x="41.6667" y="209.5" width="44" height="10"/>
-  <object id="15" name="enemy" x="457" y="303" width="140" height="10"/>
+  <object id="8" name="enemy" x="49" y="209.5" width="36.6667" height="10"/>
+  <object id="15" name="enemy" x="456.333" y="303" width="128.667" height="10"/>
  </objectgroup>
  <layer id="2" name="dark" width="20" height="15" visible="0">
   <data encoding="csv">

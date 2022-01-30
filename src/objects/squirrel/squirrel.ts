@@ -115,6 +115,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
                     if (!this.isDetectingPlayer && this.x < this.minX) {
                         this.direction = 'right';
                         this.waiting = true;
+                        this.setVelocityX(0);
                     }
                     break;
                 case 'right':
@@ -137,6 +138,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
                     if (!this.isDetectingPlayer && this.x > this.maxX) {
                         this.direction = 'left';
                         this.waiting = true;
+                        this.setVelocityX(0);
                     }
                     break;
             }
