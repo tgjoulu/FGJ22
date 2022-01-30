@@ -48,6 +48,16 @@ window.addEventListener('load', () => {
     const game = new Phaser.Game(config);
 
     if (!localStorage.getItem('highscores')) {
-        localStorage.setItem('highscores', JSON.stringify({ 1: [], 2: [], 3: [], 4: [] }));
+        localStorage.setItem(
+            'highscores',
+            JSON.stringify({
+                stage_1: [],
+                stage_2: [],
+                stage_3: [],
+                stage_4: [],
+                stage_5: [],
+                stage_6: [],
+            })
+        );
     }
 });

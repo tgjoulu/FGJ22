@@ -51,8 +51,10 @@ export default class StageSceneBase extends Phaser.Scene {
     waveGroup: Phaser.Physics.Arcade.Group;
     private waveTimer: Phaser.Time.Clock;
 
-    protected stageName: string = 'pieruperse';
+    public stageName: string = 'pieruperse';
     protected nextStageName: string;
+    private stageFinished: boolean;
+    private transitionTimer: Phaser.Time.TimerEvent;
 
     preload() {}
 
@@ -119,9 +121,9 @@ export default class StageSceneBase extends Phaser.Scene {
                 this.background.setTexture('background_dark');
             }
         });
-    }
 
-    sceneFinish() {}
+        this.scene.launch('UIScene', this);
+    }
 
     _stopSounds() {
         this.bgAnalogMusicLoops.map((s) => s.stop());
@@ -148,7 +150,7 @@ export default class StageSceneBase extends Phaser.Scene {
         }
         const worldBounds = this.lightLayer.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -64);
+        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -32);
     }
 
     _addPlayer(spawn: Phaser.Math.Vector2) {
@@ -161,13 +163,13 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _addEnemies(tileMap: Phaser.Tilemaps.Tilemap) {
-        const collectables = tileMap.getObjectLayer('enemies');
-        if (!collectables) {
+        const enemies = tileMap.getObjectLayer('enemies');
+        if (!enemies) {
             // Not in every stage => ok
             return;
         }
 
-        collectables.objects.forEach((obj) => {
+        enemies.objects.forEach((obj) => {
             const directions = ['left', 'right'] as ['left', 'right'];
             const direction = directions[Math.floor(Math.random() * 2)];
 
@@ -354,26 +356,34 @@ export default class StageSceneBase extends Phaser.Scene {
         this._checkPlayerBounds();
         this._checkEnemyBounds();
         this.waveGroup.preUpdate(time, dt);
-        if (this.collectableCount == 0) {
-            console.log(this.nextStageName);
+        if (this.collectableCount == 0 && !this.stageFinished) {
+            this.stageFinished = true;
             if (this.nextStageName) {
                 this._finishStage();
             } else {
+                // vaihda loppuruutusceneen
                 console.log('koko peli on läpi LOL');
             }
         }
     }
 
     _finishStage() {
-        // TODO näytä jotain paskaa
-        console.log('Finish stage, TODO transition juttu');
+        this.events.emit('onStageFinish');
+        this.transitionTimer = this.time.addEvent({
+            delay: 2000,
+            callback: this._startNextScene,
+            callbackScope: this,
+        });
+        this.player.body.moves = false;
         this._stopSounds();
+    }
+
+    _startNextScene() {
         this.scene.start(this.nextStageName);
     }
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            console.log('RESTART');
             this._restartScene();
         }
     }
