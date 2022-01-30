@@ -23,7 +23,8 @@ export default class VictoryScene extends Phaser.Scene {
         const bgSound = this.sound.add('outro_music', { loop: false });
         bgSound.play( {volume: 0.5} );
         this.controls.on('inputAnyKey', () => {
-            window.location.reload();
+            // window.location.reload();
+            this.scene.start('MainMenuScene');
         });
     }
 
