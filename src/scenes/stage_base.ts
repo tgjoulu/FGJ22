@@ -254,8 +254,8 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
-                    this.wolfSound.play({ volume: 0.7 });
-                    this.deathSound.play({ volume: 0.7 });
+                    this.wolfSound.play({ volume: 0.5 });
+                    this.deathSound.play({ volume: 0.5 });
                     this.player._killPlayer();
                 }
             }
@@ -381,12 +381,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.waveGroup.preUpdate(time, dt);
         if (this.collectableCount == 0 && !this.stageFinished) {
             this.stageFinished = true;
-            if (this.nextStageName) {
-                this._finishStage();
-            } else {
-                // vaihda loppuruutusceneen
-                console.log('koko peli on läpi LOL');
-            }
+            this._finishStage();
         }
     }
 
@@ -403,7 +398,12 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _startNextScene() {
-        this.scene.start(this.nextStageName);
+        if (this.nextStageName) {
+            this.scene.start(this.nextStageName);
+        } else {
+            this.scene.remove('UIScene');
+            this.scene.start('VictoryScene');
+        }
     }
 
     _checkPlayerBounds() {
