@@ -32,6 +32,9 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.image('start', 'assets/sprites/start_button.png');
 
         this.load.image('duality_tileset', 'assets/sprites/duality_tileset.png');
+
+        this.load.image('particle', 'assets/sprites/particle.png');
+
         this.load.tilemapTiledJSON('stage_1_map', `assets/tilemaps/stage_1.json`);
         this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
         this.load.tilemapTiledJSON('stage_3_map', `assets/tilemaps/stage_3.json`);
