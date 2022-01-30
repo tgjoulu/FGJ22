@@ -1,3 +1,4 @@
+import Constants from '../constants';
 import Player from '../player/player';
 import StageSceneBase from '../scenes/stage_base';
 
@@ -14,6 +15,8 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
     playerCollider: Phaser.Physics.Arcade.Collider;
     playerCollideCallback: ArcadePhysicsCallback;
     collisionTimer: Phaser.Time.Clock;
+    particlesLeft: Phaser.GameObjects.Particles.ParticleEmitterManager;
+    particlesRight: Phaser.GameObjects.Particles.ParticleEmitterManager;
 
     constructor(
         scene: StageSceneBase,
@@ -31,7 +34,7 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         this.setTexture('waveSprite');
 
         this.displayHeight = height * 2;
- 
+
         this.setOrigin(0.5, 0);
 
         scene.waveGroup.add(this, true);
@@ -44,6 +47,31 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
         this.player = player;
         this.playerCollideCallback = overlapCallback;
         this.createPlayerCollider();
+
+        this.setAlpha(0.7);
+
+        this.particlesLeft = scene.add.particles('wolf');
+        this.particlesRight = scene.add.particles('wolf');
+        this.particlesLeft.createEmitter({
+            y: { min: 0, max: Constants.DESIGN_HEIGHT + 50 },
+            angle: { start: 180, end: 360, steps: 32 },
+            lifespan: 1000,
+            speed: 40,
+            quantity: 2,
+            scale: { start: 0.3, end: 0 },
+            on: false,
+            alpha: 0.4,
+        });
+        this.particlesRight.createEmitter({
+            y: { min: 0, max: Constants.DESIGN_HEIGHT + 50 },
+            angle: { start: 0, end: 180, steps: 32 },
+            lifespan: 1000,
+            speed: 40,
+            quantity: 2,
+            scale: { start: 0.3, end: 0 },
+            on: false,
+            alpha: 0.4,
+        });
     }
 
     _initAnims() {
@@ -74,6 +102,8 @@ export default class Wave extends Phaser.Physics.Arcade.Sprite {
     };
 
     update(time: number, dt: number) {
+        this.particlesLeft.emitParticleAt(this.x - 20);
+        this.particlesRight.emitParticleAt(this.x + 20);
         // re-enable player wave collision detection if collider is not active
         // and player is not touching the wave
         if (!this.playerCollider.active && !this.scene.physics.overlap(this, this.player)) {

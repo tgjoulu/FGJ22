@@ -8,6 +8,7 @@ import Stage1Scene from './scenes/stage_1';
 import Stage2Scene from './scenes/stage_2';
 import Stage3Scene from './scenes/stage_3';
 import Stage4Scene from './scenes/stage_4';
+import Stage5Scene from './scenes/stage_5';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -24,23 +25,31 @@ const config: Phaser.Types.Core.GameConfig = {
         height: Constants.DESIGN_HEIGHT,
         zoom: 2,
         max: {
-          width: Constants.DESIGN_WIDTH,
-          height: Constants.DESIGN_HEIGHT,
-        }
+            width: Constants.DESIGN_WIDTH,
+            height: Constants.DESIGN_HEIGHT,
+        },
     },
-    scene: [MainMenuScene, Stage1Scene, Stage2Scene, Stage3Scene, Stage4Scene, UIScene],
+    scene: [
+        MainMenuScene,
+        Stage1Scene,
+        Stage2Scene,
+        Stage3Scene,
+        Stage4Scene,
+        Stage5Scene,
+        UIScene,
+    ],
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
+            debug: false,
             tileBias: 4,
             gravity: { y: Constants.GRAVITY_Y },
         },
     },
     title: 'Crystal Fusion',
     input: {
-      gamepad: true,
-      activePointers: 2,
+        gamepad: true,
+        activePointers: 2,
     },
 };
 

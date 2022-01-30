@@ -11,7 +11,6 @@ export default class MainMenuScene extends Phaser.Scene {
 
     private controls: Input;
 
-
     constructor() {
         super('main-menu');
     }
@@ -37,6 +36,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('stage_2_map', `assets/tilemaps/stage_2.json`);
         this.load.tilemapTiledJSON('stage_3_map', `assets/tilemaps/stage_3.json`);
         this.load.tilemapTiledJSON('stage_4_map', `assets/tilemaps/stage_4.json`);
+        this.load.tilemapTiledJSON('stage_5_map', `assets/tilemaps/stage_5.json`);
         this.load.spritesheet('player', 'assets/sprites/character_running.png', {
             frameWidth: 40,
             frameHeight: 40,
@@ -70,6 +70,11 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.audio('digiBass', 'assets/sound/bass.wav');
         this.load.audio('digiPads', 'assets/sound/pads.wav');
         this.load.audio('digiLead', 'assets/sound/lead.wav');
+
+        this.load.audio('death1', 'assets/sound/sfx/death1.wav');
+        this.load.audio('crystal', 'assets/sound/sfx/crystal.mp3');
+        this.load.audio('teleport', 'assets/sound/sfx/teleport.mp3');
+        this.load.audio('wave', 'assets/sound/sfx/wave.mp3');
 
         this.load.audio('mainmenu_music', 'assets/sound/mainmenu.mp3');
 
