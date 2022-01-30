@@ -46,8 +46,10 @@ export default class StageSceneBase extends Phaser.Scene {
     waveGroup: Phaser.Physics.Arcade.Group;
     private waveTimer: Phaser.Time.Clock;
 
-    protected stageName: string = 'pieruperse';
+    public stageName: string = 'pieruperse';
     protected nextStageName: string;
+    private stageFinished: boolean;
+    private transitionTimer: Phaser.Time.TimerEvent;
 
     preload() {
         // TODO get from args somehow
@@ -130,9 +132,9 @@ export default class StageSceneBase extends Phaser.Scene {
                 this.background.setTexture('background_dark');
             }
         });
-    }
 
-    sceneFinish() {}
+        this.scene.launch('UIScene', this);
+    }
 
     _restartScene() {
         this.bgAnalogMusicLoops.map((s) => s.stop());
@@ -306,8 +308,8 @@ export default class StageSceneBase extends Phaser.Scene {
         });
         this._checkPlayerBounds();
         this.waveGroup.preUpdate(time, dt);
-        if (this.collectableCount == 0) {
-            console.log(this.nextStageName);
+        if (this.collectableCount == 0 && !this.stageFinished) {
+            this.stageFinished = true;
             if (this.nextStageName) {
                 this._finishStage();
             } else {
@@ -317,8 +319,16 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _finishStage() {
-        // TODO näytä jotain paskaa
-        console.log('Finish stage, TODO transition juttu');
+        this.events.emit('onStageFinish');
+        this.transitionTimer = this.time.addEvent({
+            delay: 2000,
+            callback: this._startNextScene,
+            callbackScope: this,
+        });
+        this.player.body.moves = false;
+    }
+
+    _startNextScene() {
         this.scene.start(this.nextStageName);
     }
 
