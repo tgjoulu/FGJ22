@@ -53,6 +53,10 @@ export default class MainMenuScene extends Phaser.Scene {
             frameWidth: 40,
             frameHeight: 40,
         });
+        this.load.spritesheet('wave', 'assets/sprites/wave_sheet.png', {
+            frameWidth: 32,
+            frameHeight: 360,
+        });
         this.load.audio('analDrums', 'assets/sound/AnalogDrums.wav');
         this.load.audio('analBass', 'assets/sound/AnalogBass.wav');
         this.load.audio('digiDrums', 'assets/sound/drums.wav');
