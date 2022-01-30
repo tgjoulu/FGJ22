@@ -97,8 +97,9 @@ export default class Input extends Phaser.Events.EventEmitter {
         });
         this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
             if (!this.movePointer.isDown || pointer !== this.movePointer) {
-                if (pointer.upTime - pointer.downTime < 100) {
+                if (pointer.upTime - pointer.downTime < 150) {
                     this._emitJump();
+                    this._emitAnyKey();
                 }
             } else {
             }
