@@ -11,17 +11,18 @@ export default class Input extends Phaser.Events.EventEmitter {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     private keys: Keys;
     private gamepad: Phaser.Input.Gamepad.Gamepad;
-    private pointer: Phaser.Input.Pointer;
 
     private scene: Phaser.Scene;
 
     private tapTimer: number;
+    private movePointer: Phaser.Input.Pointer;
+
 
     public constructor(scene: Phaser.Scene) {
         super()
         // super('input')
         this.scene = scene;
-        this.pointer = scene.input.activePointer;
+        this.movePointer = scene.input.activePointer;
         this.cursors = scene.input.keyboard.createCursorKeys();
         if (scene.input.gamepad.total) {
             this.gamepad = scene.input.gamepad.getPad(0);
@@ -86,30 +87,37 @@ export default class Input extends Phaser.Events.EventEmitter {
 
     _setupTouchControls() {
         this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            this.tapTimer = pointer.event.timeStamp;
+            if (!this.movePointer.isDown) {
+                this.movePointer = pointer;
+            }
         });
         this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-            if (pointer.event.timeStamp - this.tapTimer < 70) {
-                this._emitJump();
+            if (!this.movePointer.isDown || pointer !== this.movePointer) {
+                if (pointer.upTime - pointer.downTime < 100) {
+                    this._emitJump();
+                }
+            } else {
             }
         });
     }
 
     isRightKeyDown(): boolean {
+        const pointer = this.scene.input.activePointer;
         return (
             (this.gamepad && this.gamepad.right)
             || this.keys.right.isDown
             || this.cursors.right.isDown
-            || (this.pointer.isDown && this.pointer.x > Constants.DESIGN_WIDTH/2)
+            || (this.movePointer && this.movePointer.isDown && this.movePointer.x > Constants.DESIGN_WIDTH/2)
         );
     }
 
     isLeftKeyDown(): boolean {
+        const pointer = this.scene.input.activePointer;
         return (
             (this.gamepad && this.gamepad.left)
             || this.keys.left.isDown
             || this.cursors.left.isDown
-            || (this.pointer.isDown && this.pointer.x < Constants.DESIGN_WIDTH/2)
+            || (this.movePointer && this.movePointer.isDown && this.movePointer.x < Constants.DESIGN_WIDTH/2)
         );
     }
 }

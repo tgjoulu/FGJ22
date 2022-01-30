@@ -78,6 +78,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.audio('crystal', 'assets/sound/sfx/crystal.mp3');
         this.load.audio('teleport', 'assets/sound/sfx/teleport.mp3');
         this.load.audio('wave', 'assets/sound/sfx/wave.mp3');
+        this.load.audio('wolf', 'assets/sound/sfx/enemy.mp3');
 
         this.load.audio('mainmenu_music', 'assets/sound/mainmenu.mp3');
 

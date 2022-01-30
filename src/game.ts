@@ -49,7 +49,7 @@ const config: Phaser.Types.Core.GameConfig = {
     title: 'Crystal Fusion',
     input: {
         gamepad: true,
-        activePointers: 2,
+        activePointers: 3,
     },
 };
 

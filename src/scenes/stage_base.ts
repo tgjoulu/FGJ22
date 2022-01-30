@@ -37,6 +37,7 @@ export default class StageSceneBase extends Phaser.Scene {
     private teleportSound: Phaser.Sound.BaseSound;
     private crystalSound: Phaser.Sound.BaseSound;
     private waveSound: Phaser.Sound.BaseSound;
+    private wolfSound: Phaser.Sound.BaseSound;
 
     private bgAnalogMusicLoops: Phaser.Sound.BaseSound[];
     private bgDigitalMusicLoops: Phaser.Sound.BaseSound[];
@@ -100,6 +101,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this.deathSound = this.sound.add('death1');
         this.teleportSound = this.sound.add('teleport');
         this.waveSound = this.sound.add('wave');
+        this.wolfSound = this.sound.add('wolf');
 
 
         this.analDrumVol = 0.05;
@@ -249,6 +251,7 @@ export default class StageSceneBase extends Phaser.Scene {
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
                     this._stopSounds();
+                    this.wolfSound.play( {volume: 0.7});
                     this.deathSound.play( {volume: 0.7});
                     this.player._killPlayer();
                 }
