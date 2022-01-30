@@ -12,10 +12,8 @@ enum WorldSide {
 }
 
 export default class StageSceneBase extends Phaser.Scene {
-    private aboveLight: Phaser.Tilemaps.TilemapLayer;
-    private belowLight: Phaser.Tilemaps.TilemapLayer;
-    private aboveDark: Phaser.Tilemaps.TilemapLayer;
-    private belowDark: Phaser.Tilemaps.TilemapLayer;
+    private lightLayer: Phaser.Tilemaps.TilemapLayer;
+    private darkLayer: Phaser.Tilemaps.TilemapLayer;
     private player: Player;
     private worldSwapKey: Phaser.Input.Keyboard.Key;
     private stage1Key: Phaser.Input.Keyboard.Key;
@@ -136,10 +134,10 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _initCamera() {
-        if (!this.belowLight) {
+        if (!this.lightLayer) {
             console.error('Initialize layers first lol');
         }
-        const worldBounds = this.belowLight.getBounds();
+        const worldBounds = this.lightLayer.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
         this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -128);
     }
@@ -205,22 +203,20 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _initLevel(tileMap: Phaser.Tilemaps.Tilemap, tileSet: Phaser.Tilemaps.Tileset) {
-        this.aboveLight = tileMap.createLayer('above_light', tileSet, 0, 0);
-        this.belowLight = tileMap.createLayer('below_light', tileSet, 0, 0);
-        this.aboveDark = tileMap.createLayer('above_dark', tileSet, 0, 0);
-        this.belowDark = tileMap.createLayer('below_dark', tileSet, 0, 0);
-        const mapBounds = this.belowLight.getBounds();
+        this.lightLayer = tileMap.createLayer('light', tileSet, 0, 0);
+        this.darkLayer = tileMap.createLayer('dark', tileSet, 0, 0);
+        const mapBounds = this.lightLayer.getBounds();
         this.physics.world.setBounds(0, 0, mapBounds.width, mapBounds.height);
     }
 
     _initWorldColliders() {
-        this.belowLight.setCollisionByProperty({ collides: true });
-        this.belowDark.setCollisionByProperty({ collides: true });
+        this.lightLayer.setCollisionByProperty({ collides: true });
+        this.darkLayer.setCollisionByProperty({ collides: true });
 
-        this.lightWorldCollider = this.physics.add.collider(this.player, this.belowLight);
-        this.darkWorldCollider = this.physics.add.collider(this.player, this.belowDark);
-        this.lightWorldEnemyCollider = this.physics.add.collider(this.squirrels, this.belowLight);
-        this.darkWorldEnemyCollider = this.physics.add.collider(this.squirrels, this.belowDark);
+        this.lightWorldCollider = this.physics.add.collider(this.player, this.lightLayer);
+        this.darkWorldCollider = this.physics.add.collider(this.player, this.darkLayer);
+        this.lightWorldEnemyCollider = this.physics.add.collider(this.squirrels, this.lightLayer);
+        this.darkWorldEnemyCollider = this.physics.add.collider(this.squirrels, this.darkLayer);
 
         this.lightWorldCollider.active = false;
         this.darkWorldCollider.active = false;
@@ -260,13 +256,11 @@ export default class StageSceneBase extends Phaser.Scene {
 
         this.darkWorldCollider.active = darkSide;
         this.darkWorldEnemyCollider.active = darkSide;
-        this.belowDark.visible = darkSide;
-        this.aboveDark.visible = darkSide;
+        this.darkLayer.visible = darkSide;
 
         this.lightWorldCollider.active = lightSide;
         this.lightWorldEnemyCollider.active = lightSide;
-        this.belowLight.visible = lightSide;
-        this.aboveLight.visible = lightSide;
+        this.lightLayer.visible = lightSide;
 
         this.enemiesCollider.active = worldSide === WorldSide.Dark;
     }
