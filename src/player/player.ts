@@ -77,7 +77,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     update(time: number, dt: number) {
         if (this.isDying) {
-            this.setRotation(this.rotation + 0.2);
+            this.setRotation(this.rotation + 0.04 * dt);
             this.setVelocityY(-130);
             this.deadAnimationDelta = this.deadAnimationDelta + 1;
 
