@@ -42,6 +42,18 @@
                  "width":0,
                  "x":219.52073,
                  "y":245
+                }, 
+                {
+                 "height":0,
+                 "id":10,
+                 "name":"col",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":792.52073,
+                 "y":257.648666666667
                 }],
          "offsetx":14.1459366666667,
          "offsety":155.018,
@@ -136,7 +148,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":10,
+ "nextobjectid":11,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.7.2",
