@@ -30,7 +30,7 @@ export default class MainMenuScene extends Phaser.Scene {
             progBar.width = 300 * value;
         });
 
-        this.load.image('start', 'assets/sprites/start.png');
+        this.load.image('start', 'assets/sprites/start_button.png');
 
         this.load.image('duality_tileset', 'assets/sprites/duality_tileset.png');
         this.load.tilemapTiledJSON('stage_1_map', `assets/tilemaps/stage_1.json`);
@@ -44,6 +44,10 @@ export default class MainMenuScene extends Phaser.Scene {
         this.load.spritesheet('collectable', 'assets/sprites/crystal_sheet.png', {
             frameWidth: 32,
             frameHeight: 32,
+        });
+        this.load.spritesheet('collectable_big', 'assets/sprites/crystal_big_sheet.png', {
+            frameWidth: 64,
+            frameHeight: 64,
         });
         this.load.spritesheet('squirrel', 'assets/sprites/squirrel_sheet.png', {
             frameWidth: 32,
@@ -73,11 +77,19 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.load.image('background_light', 'assets/sprites/background_light.png');
         this.load.image('background_dark', 'assets/sprites/background_dark.png');
+
+        this.load.image('start_menu', 'assets/sprites/start_menu.png');
+
     }
 
     create() {
         const { width, height } = this.scale;
-        const startButton = this.add.image(width * 0.5, height * 0.4, 'start');
+
+
+        this.add.image(width * 0.5, height * 0.5, 'start_menu');
+
+        const startButton = this.add.image(width * 0.5, height * 0.7, 'start');
+        startButton.setScale(0.5)
         startButton.setInteractive();
         // const anotherButton = this.add.image(width * 0.5, height * 0.65, 'start');
 
@@ -88,7 +100,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.buttons.push(startButton);
         // this.buttons.push(anotherButton);
 
-        this.buttonSelector = this.add.image(0, 0, '');
+        //this.buttonSelector = this.add.image(0, 0, '');
 
         this.selectButton(0);
 
@@ -100,6 +112,19 @@ export default class MainMenuScene extends Phaser.Scene {
         this.controls.on('inputDown', () => this.selectNextButton(1));
         this.controls.on('inputUp', () => this.selectNextButton(-1));
         this.controls.on('inputJump', () => {this.confirmSelection()});
+
+        const crystalAnimation = this.anims.create({
+            key: 'run',
+            frames: this.anims.generateFrameNumbers('collectable', { start: 0, end: 3 }),
+            frameRate: 4,
+            repeat: -1,
+        });
+
+        const crystal = this.add.sprite(64, 64, 'collectable_big');
+        crystal.setScale(4);
+        crystal.setPosition(width * 0.5, height * 0.3)
+        crystal.play('run');
+
     }
 
     selectButton(index: number) {
@@ -109,10 +134,10 @@ export default class MainMenuScene extends Phaser.Scene {
 
         const button = this.buttons[index];
 
-        button.setTint(0x66ff7f);
+        //button.setTint(0x66ff7f);
 
-        this.buttonSelector.x = button.x + button.displayWidth * 0.5;
-        this.buttonSelector.y = button.y + 10;
+        //this.buttonSelector.x = button.x + button.displayWidth * 0.5;
+        //this.buttonSelector.y = button.y + 10;
 
         this.selectedButtonIndex = index;
     }
