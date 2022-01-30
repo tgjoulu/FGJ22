@@ -232,7 +232,7 @@ export default class StageSceneBase extends Phaser.Scene {
             this.squirrels,
             (player, squirrel) => {
                 if ((squirrel as Squirrel).enemyType === 'dark') {
-                    this._restartScene();
+                    this.player._killPlayer();
                 }
             }
         );
