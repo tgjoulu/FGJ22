@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="12" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="5">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="20" height="12" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="7">
  <editorsettings>
   <export target="stage_2.json" format="json"/>
  </editorsettings>
@@ -147,7 +147,13 @@
   </tile>
  </tileset>
  <objectgroup id="8" name="collectables" offsetx="3.47927" offsety="147.018">
-  <object id="4" x="613.886" y="14.7063">
+  <object id="4" x="612.48" y="25.2535">
+   <point/>
+  </object>
+  <object id="5" x="303.797" y="59.5055">
+   <point/>
+  </object>
+  <object id="6" x="234.076" y="11.8787">
    <point/>
   </object>
  </objectgroup>

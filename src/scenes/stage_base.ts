@@ -150,7 +150,7 @@ export default class StageSceneBase extends Phaser.Scene {
         }
         const worldBounds = this.lightLayer.getBounds();
         this.cameras.main.setBounds(0, 0, worldBounds.width, worldBounds.height, true);
-        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -64);
+        this.cameras.main.startFollow(this.player, false, 0.5, 0.5, 0, -32);
     }
 
     _addPlayer(spawn: Phaser.Math.Vector2) {
@@ -163,13 +163,13 @@ export default class StageSceneBase extends Phaser.Scene {
     }
 
     _addEnemies(tileMap: Phaser.Tilemaps.Tilemap) {
-        const collectables = tileMap.getObjectLayer('enemies');
-        if (!collectables) {
+        const enemies = tileMap.getObjectLayer('enemies');
+        if (!enemies) {
             // Not in every stage => ok
             return;
         }
 
-        collectables.objects.forEach((obj) => {
+        enemies.objects.forEach((obj) => {
             const directions = ['left', 'right'] as ['left', 'right'];
             const direction = directions[Math.floor(Math.random() * 2)];
 
@@ -361,6 +361,7 @@ export default class StageSceneBase extends Phaser.Scene {
             if (this.nextStageName) {
                 this._finishStage();
             } else {
+                // vaihda loppuruutusceneen
                 console.log('koko peli on läpi LOL');
             }
         }
@@ -383,7 +384,6 @@ export default class StageSceneBase extends Phaser.Scene {
 
     _checkPlayerBounds() {
         if (this.player.y > this.physics.world.bounds.bottom) {
-            console.log('RESTART');
             this._restartScene();
         }
     }
