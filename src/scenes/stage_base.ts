@@ -99,7 +99,6 @@ export default class StageSceneBase extends Phaser.Scene {
         this.deathSound = this.sound.add('death1');
         this.teleportSound = this.sound.add('teleport');
 
-
         this.analDrumVol = 0.05;
         this.analBassVol = 1;
         this.digiDrumVol = 0.05;
