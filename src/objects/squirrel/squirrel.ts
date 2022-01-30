@@ -49,13 +49,6 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
         this.body.setBoundsRectangle(new Phaser.Geom.Rectangle(0, 220, 1024, 400));
         this.body.setImmovable(true);
-        // Stop velocity when hitting world bounds
-        scene.physics.world.on('worldbounds', () => {
-            if (this) {
-                this.setVelocity(0);
-                this.stop();
-            }
-        });
 
         this._initAnims();
     }
@@ -107,18 +100,14 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
                     if (this.enemyType === 'light') {
                         if (this.isDetectingPlayer) {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(-this.squirrelSpeedFast);
                         } else {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(-this.squirrelSpeed);
                         }
                     } else if (this.enemyType === 'dark') {
                         if (this.isDetectingPlayer) {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(-this.wolfSpeedFast);
                         } else {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(-this.wolfSpeed);
                         }
                     }
@@ -126,6 +115,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
                     if (!this.isDetectingPlayer && this.x < this.minX) {
                         this.direction = 'right';
                         this.waiting = true;
+                        this.setVelocityX(0);
                     }
                     break;
                 case 'right':
@@ -133,18 +123,14 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
                     if (this.enemyType === 'light') {
                         if (this.isDetectingPlayer) {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(this.squirrelSpeedFast);
                         } else {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(this.squirrelSpeed);
                         }
                     } else if (this.enemyType === 'dark') {
                         if (this.isDetectingPlayer) {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(this.wolfSpeedFast);
                         } else {
-                            this.body.velocity.x = 40;
                             this.setVelocityX(this.wolfSpeed);
                         }
                     }
@@ -152,6 +138,7 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
                     if (!this.isDetectingPlayer && this.x > this.maxX) {
                         this.direction = 'left';
                         this.waiting = true;
+                        this.setVelocityX(0);
                     }
                     break;
             }
@@ -171,6 +158,10 @@ export default class Squirrel extends Phaser.Physics.Arcade.Sprite {
 
     onLostPlayer = () => {
         this.isDetectingPlayer = false;
+    };
+
+    onLevelEnd = () => {
+        this.waiting = true;
     };
 
     onWorldChange = (activeWorld: 0 | 1) => {

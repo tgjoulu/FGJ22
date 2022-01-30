@@ -13,11 +13,18 @@ export default class UIScene extends Phaser.Scene {
 
     private levelFinished: boolean;
 
+    private timerbg: Phaser.GameObjects.Image;
+
     init(scene: StageSceneBase) {
         this.currentScene = scene;
     }
 
     create() {
+        this.timerbg = this.add.image(
+            this.cameras.main.width * 0.060,
+            this.cameras.main.height * 0.045,
+            'timerbg');
+        
         this.timeText = this.add.text(
             this.cameras.main.width * 0.03,
             this.cameras.main.height * 0.03,
@@ -43,9 +50,18 @@ export default class UIScene extends Phaser.Scene {
         }
 
         this.tweens.add({
-            targets: this.timeText,
-            x: this.cameras.main.width / 2,
+            targets: [this.timeText],
+            x: this.cameras.main.width / 2 - 10,
             y: this.cameras.main.height / 2,
+            scale: 2,
+            ease: 'Bounce.EaseOut',
+            duration: 700,
+        });
+
+        this.tweens.add({
+            targets: [this.timerbg],
+            x: this.cameras.main.width / 2 + 15,
+            y: this.cameras.main.height / 2 + 10,
             scale: 2,
             ease: 'Bounce.EaseOut',
             duration: 700,
