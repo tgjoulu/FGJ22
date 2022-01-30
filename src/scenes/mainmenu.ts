@@ -55,8 +55,13 @@ export default class MainMenuScene extends Phaser.Scene {
         });
         this.load.audio('analDrums', 'assets/sound/AnalogDrums.wav');
         this.load.audio('analBass', 'assets/sound/AnalogBass.wav');
+        this.load.audio('analPads', 'assets/sound/AnalogPads.wav');
+        this.load.audio('analLead', 'assets/sound/AnalogLead.wav');
+
         this.load.audio('digiDrums', 'assets/sound/drums.wav');
         this.load.audio('digiBass', 'assets/sound/bass.wav');
+        this.load.audio('digiPads', 'assets/sound/pads.wav');
+        this.load.audio('digiLead', 'assets/sound/lead.wav');
 
         this.load.audio('mainmenu_music', 'assets/sound/mainmenu.mp3');
 

@@ -85,8 +85,12 @@ export default class StageSceneBase extends Phaser.Scene {
         //this._debugRenderTileCollisions(map);
         const bgAnalDrums = this.sound.add('analDrums', { loop: false });
         const bgAnalBass = this.sound.add('analBass', { loop: false });
+        const bgAnalPads = this.sound.add('analPads', { loop: false });
+        const bgAnalLead = this.sound.add('analLead', { loop: false });
         const bgDigiDrums = this.sound.add('digiDrums', { loop: false });
         const bgDigiBass = this.sound.add('digiBass', { loop: false });
+        const bgDigiPads = this.sound.add('digiPads', { loop: false });
+        const bgDigiLead = this.sound.add('digiLead', { loop: false });
 
         this.analDrumVol = 0.05;
         this.analBassVol = 1;
