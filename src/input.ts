@@ -51,6 +51,7 @@ export default class Input extends Phaser.Events.EventEmitter {
     _emitRight() {this.emit('inputRight');}
     _emitUp() {this.emit('inputUp');}
     _emitDown() {this.emit('inputDown');}
+    _emitAnyKey() {this.emit('inputAnyKey');}
 
     _setupGamepadEvents() {
         this.gamepad.on('down', () => {
@@ -69,6 +70,7 @@ export default class Input extends Phaser.Events.EventEmitter {
             if (this.gamepad.A) {
                 this._emitJump();
             }
+            this._emitAnyKey();
         });
     }
 
@@ -83,6 +85,8 @@ export default class Input extends Phaser.Events.EventEmitter {
         this.cursors.left.on('down', () => this._emitLeft() );
         this.cursors.right.on('down', () => this._emitRight() );
         this.cursors.space.on('down', () => this._emitJump() );
+
+        this.scene.input.keyboard.on('keydown', () => this._emitAnyKey());
     }
 
     _setupTouchControls() {
