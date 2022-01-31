@@ -84,7 +84,7 @@ export default class StageSceneBase extends Phaser.Scene {
         this._initLevel(map, tileSet);
         this._initWorldColliders();
         this._enableWorld(WorldSide.Light);
-        //this._enableDebugKeys();
+        this._enableDebugKeys();
         this._initCamera();
         this._initWaves();
         this._createCollectables(map);
@@ -304,14 +304,14 @@ export default class StageSceneBase extends Phaser.Scene {
         this.stage6Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SIX);
         this.worldSwapKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        this.worldSwapKey.on('down', () => {
-            const activeWorldSide =
-                this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light;
-            this._enableWorld(activeWorldSide);
-            this.events.emit('onWorldChange', activeWorldSide);
-            // Flash on world change
-            this.cameras.main.flash(500, 115, 30, 62);
-        });
+        // this.worldSwapKey.on('down', () => {
+        //     const activeWorldSide =
+        //         this.activeWorldSide == WorldSide.Light ? WorldSide.Dark : WorldSide.Light;
+        //     this._enableWorld(activeWorldSide);
+        //     this.events.emit('onWorldChange', activeWorldSide);
+        //     // Flash on world change
+        //     this.cameras.main.flash(500, 115, 30, 62);
+        // });
         this.restartKey.on('down', () => {
             this._restartScene();
         });
